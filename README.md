@@ -54,8 +54,7 @@ Distribute `trainscorer`.
 
 ```zsh
 # trainscorer -> python -m scorer.train
-python -m trainer.distribute \
-    --script trainscorer \
+trainscorer \
     --gpus "0,1" \
     --output_dir ./models/TranScorer-en \
     --model_type roberta \
