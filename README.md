@@ -50,7 +50,7 @@ python -m scorer.transformer.tokenizer \
 
 ## Training a new scorer from scratch
 
-Distribute `trainscorer`.
+Start training a scorer using  `trainscorer`.
 
 ```zsh
 # trainscorer -> python -m scorer.train
