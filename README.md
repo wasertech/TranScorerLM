@@ -6,14 +6,17 @@ Transformer as Scorer (Language Model) for STT accoustic models.
 
 ```zsh
 # Install with pip
-pip install git+https://github.com/wasertech/TranScorerLM.git
+❯ pip install git+https://github.com/wasertech/TranScorerLM.git
 
 # Use TranScorer to convert an accoustic representation to text
-transcorer \
-    --accoustic path/to/stt/accoustic/model/output_graph.tflite \
-    --in_put (path/to/audio.wav|"Input text.") \
-    --scorer path/to/stt/language/model/scorer.transform \
-    --out_put path/to/output.txt
+❯ transcorer -f 'audio.wav'
+Some weights of Wav2Vec2ForCTC were not initialized from the model checkpoint at facebook/wav2vec2-base-960h and are newly initialized: ['wav2vec2.masked_spec_embed']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+Loading TranScorer......Took 2.2624789050023537 second(s).
+Loading audio.wav......Took 0.00048493899521417916 second(s).
+Tokenizing......Took 0.0008750690030865371 second(s).
+Decoding speech......Took 0.21528533000673633 second(s).
+CAN I TEST YOU
 ```
 
 When `--in_put` is a valid audio file, it is used to get the accoustic representation.
