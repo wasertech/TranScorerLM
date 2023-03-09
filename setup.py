@@ -21,11 +21,12 @@ setup(
     python_requires='>=3.8,<3.11',
     install_requires = [
         'transformers~=4.26.1',
-        'torch~=1.13.1',
+        #'torch~=1.13.1',
+        'datasets>=1.18.0',
     ],
     entry_points={
         'console_scripts': [
-            'trainscorer = scorer.train:main',
+            'trainscorer = scorer.train:train',
             'transcorer = scorer.main:main',
         ]
     },

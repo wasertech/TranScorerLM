@@ -55,60 +55,43 @@ Start training a scorer using  `trainscorer`.
 ```zsh
 # trainscorer -> python -m scorer.train
 trainscorer \
-    --gpus "0,1" \
-    --output_dir ./models/TranScorer-en \
-    --model_type roberta \
-    --mlm \
-    --config_name ./models/TranScorer-en \
-    --tokenizer_name ./models/TranScorer-en \
+    --model_name_or_path facebook/wav2vec2-base \
+    --dataset_name wav2txt \
+    --dataset_config_name wav2txt \
+    --output_dir wav2txt/models \
+    --overwrite_output_dir \
+    --remove_unused_columns False \
     --do_train \
     --do_eval \
-    --learning_rate 1e-4 \
+    --fp16 \
+    --learning_rate 3e-5 \
+    --max_length_seconds 1 \
+    --attention_mask False \
+    --warmup_ratio 0.1 \
     --num_train_epochs 5 \
-    --save_total_limit 2 \
-    --save_steps 2000 \
-    --per_gpu_train_batch_size 64 \
-    --evaluate_during_training \
-    --seed 42
+    --per_device_train_batch_size 32 \
+    --gradient_accumulation_steps 4 \
+    --per_device_eval_batch_size 32 \
+    --dataloader_num_workers 4 \
+    --logging_strategy steps \
+    --logging_steps 10 \
+    --evaluation_strategy epoch \
+    --save_strategy epoch \
+    --load_best_model_at_end True \
+    --metric_for_best_model accuracy \
+    --save_total_limit 3 \
+    --seed 0 \
+    --push_to_hub
 ```
 
 You can also train directly from a `python` script.
 
 ```python
-from scorer import TranScorerModelConfig, TranScorerModel, is_cuda_available
-
-from trainer import Trainer
-from trainer.trainer import TrainerArgs
-
-def train(trainer):
-    return trainer.fit()
-
-def main():
-    args = TrainerArgs()
-
-    config = TranScorerModelConfig()
-    config.batch_size = 64
-    config.grad_clip = None
-
-    model = TranScorerModel()
-
-    is_cuda = is_cuda_available()
-
-    trainer = Trainer(
-            args,
-            config,
-            model=model,
-            output_path=os.getcwd(),
-            gpu=0 if is_cuda else None
-        )
-
-    trainer.config.epochs = 10
-    
-    return train(trainer)
+from scorer.train import train
 
 if __name__ == "__main__":
     try:
-        main()
+        train()
         sys.exit(0)
     except KeyboardInterrupt:
         sys.exit(1)
