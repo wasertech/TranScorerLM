@@ -25,17 +25,12 @@ You can also use the *`scorer`* `python` module.
 ```python
 from pathlib import Path
 
-from scorer import Scorer
+from scorer.transformer import TranScorer
 
-# Import STT Transcoder from shortcuts
-# You could transcode from Speech-To-Text (transcode_stt)
-# or from Text-To-Speech (transcode_tts)
-from scorer.shortcuts import transcode_stt
-
-lm = Scorer("path/to/stt/language/model/scorer.transform")
+ts = TranScorer("path/to/scorer.transform")
 
 to_transcribe = "path/to/audio.wav" 
-transcript = transcode_stt("path/to/stt/accoustic/model/output_graph.tflite", to_transcribe if Path(to_transcribe).exists() else "Input text.", lm)
+transcript = ts.transcribe(to_transcribe)
 print(f"{to_transcribe=} -> {transcript=}")
 ```
 
