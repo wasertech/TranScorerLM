@@ -3,7 +3,7 @@ from typing import Optional
 from dataclasses import dataclass, field
 from glob import glob
 import torch
-
+from typing import Dict, List, Union
 from torch.utils.data import Dataset, ConcatDataset
 
 import datasets
@@ -20,6 +20,9 @@ from transformers import (
     set_seed,
 )
 from datasets import DatasetDict, load_dataset
+
+def list_field(default=None, metadata=None):
+    return field(default_factory=lambda: default, metadata=metadata)
 
 class TranScorerDataset(Dataset):
     def __init__(self, evaluate: bool = False):
@@ -50,6 +53,9 @@ class TranScorerDataTrainingArguments:
     the command line.
     """
 
+    data_path: str = field(
+        metadata={"help": "Path to dataset"}
+    )
     dataset_name: str = field(
         metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
