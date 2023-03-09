@@ -2,6 +2,7 @@ import torch, torchaudio
 import contextlib
 import wave
 import numpy as np
+import time
 
 from transformers import (
         Wav2Vec2Processor,
@@ -12,17 +13,33 @@ class TranScorer:
     
     def __init__(self, accoustic_model_name, language_model_name, **kwargs):
         #self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        t = time.perf_counter()
+        print("Loading TranScorer...", end="")
         self.sample_rate = 16_000 # Hz
         self.accoustic_processor = Wav2Vec2Processor.from_pretrained(accoustic_model_name)
         self.language_model = Wav2Vec2ForCTC.from_pretrained(language_model_name)
+        _t = time.perf_counter()
+        print(f"...Took {_t - t} second(s).")
 
     def transcribe(self, audio_file_path):
+        t = time.perf_counter()
+        print(f"Loading {audio_file_path}...", end="")
         wav = self.read_wav(audio_file_path)
-        # print(f"{wav=}")
+        _t = time.perf_counter()
+        print(f"...Took {_t - t} second(s).")
+        
+        t = time.perf_counter()
+        print(f"Tokenizing...", end="")
         vec = self.wav2vec(wav)
-        # print(f"{vec=}")
+        _t = time.perf_counter()
+        print(f"...Took {_t - t} second(s).")
+        
+        t = time.perf_counter()
+        print(f"Decoding speech...", end="")
         txt = self.vec2txt(vec)
-        # print(f"{txt=}")
+        _t = time.perf_counter()
+        print(f"...Took {_t - t} second(s).")
+        
         return txt[0]
     
     def read_wav(self, wav_path):
