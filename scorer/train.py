@@ -146,34 +146,36 @@ def train():
         if not train_files:
             raise ValueError(f"No training files found under {data_args.data_path}")
         wav2txt['train'] = load_dataset('csv', data_files=train_files)
+        train_data = wav2txt['train']
+        print(train_data)
+        print(f"train_column_names={train_data.column_names}")
 
-        print(f"train_column_names={wav2txt['train'].column_names}")
-
-        if data_args.audio_column_name not in wav2txt["train"].column_names:
+        if data_args.audio_column_name not in train_data.column_names:
             raise ValueError(
                 f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
                 " Make sure to set `--audio_column_name` to the correct audio column - one of"
-                f" {', '.join(wav2txt['train'].column_names)}."
+                f" {', '.join(train_data.column_names)}."
             )
 
         if data_args.text_column_name not in wav2txt["train"].column_names:
             raise ValueError(
                 f"--text_column_name {data_args.text_column_name} not found in dataset '{data_args.dataset_name}'. "
                 "Make sure to set `--text_column_name` to the correct text column - one of "
-                f"{', '.join(wav2txt['train'].column_names)}."
+                f"{', '.join(train_data.column_names)}."
             )
 
         if data_args.max_train_samples is not None:
-            wav2txt["train"] = wav2txt["train"].select(range(data_args.max_train_samples))
+            wav2txt["train"] = train_data.select(range(data_args.max_train_samples))
 
     if training_args.do_eval:
         dev_files = glob(f"{str(data_path)}/**/*_dev.csv")
         if not dev_files:
             raise ValueError(f"No dev files found under {data_path}")
         wav2txt['eval'] = load_dataset('csv', data_files=dev_files)
+        eval_data = wav2txt['eval']
 
         if data_args.max_eval_samples is not None:
-            wav2txt["eval"] = wav2txt["eval"].select(range(data_args.max_eval_samples))
+            wav2txt["eval"] = eval_data.select(range(data_args.max_eval_samples))
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
