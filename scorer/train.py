@@ -148,20 +148,20 @@ def train():
         wav2txt['train'] = load_dataset('csv', data_files=train_files)
         train_data = wav2txt['train']
         print(train_data)
-        print(f"train_column_names={train_data.column_names}")
+        print(f"train_column_names={train_data.column_names['train']}")
 
-        if data_args.audio_column_name not in train_data.column_names:
+        if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
                 f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
                 " Make sure to set `--audio_column_name` to the correct audio column - one of"
-                f" {', '.join(train_data.column_names)}."
+                f" {', '.join(train_data.column_names['train'])}."
             )
 
-        if data_args.text_column_name not in wav2txt["train"].column_names:
+        if data_args.text_column_name not in train_data.column_names['train']:
             raise ValueError(
                 f"--text_column_name {data_args.text_column_name} not found in dataset '{data_args.dataset_name}'. "
                 "Make sure to set `--text_column_name` to the correct text column - one of "
-                f"{', '.join(train_data.column_names)}."
+                f"{', '.join(train_data.column_names['train'])}."
             )
 
         if data_args.max_train_samples is not None:
