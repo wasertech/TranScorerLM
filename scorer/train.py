@@ -142,7 +142,9 @@ def train():
     wav2txt = DatasetDict()
 
     if training_args.do_train:
-        train_files = glob(f"{str(data_args.data_path)}/**/*-train.csv")
+        train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
+        if not train_files:
+            raise ValueError(f"No training files found under {data_args.data_path}")
         wav2txt['train'] = load_dataset('csv', data_files=train_files)
 
         if data_args.audio_column_name not in wav2txt["train"].column_names:
@@ -163,7 +165,9 @@ def train():
             wav2txt["train"] = wav2txt["train"].select(range(data_args.max_train_samples))
 
     if training_args.do_eval:
-        dev_files = glob(f"{str(data_path)}/**/*-dev.csv")
+        dev_files = glob(f"{str(data_path)}/**/*_dev.csv")
+        if not dev_files:
+            raise ValueError(f"No dev files found under {data_path}")
         wav2txt['eval'] = load_dataset('csv', data_files=dev_files)
 
         if data_args.max_eval_samples is not None:
