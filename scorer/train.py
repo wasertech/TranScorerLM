@@ -194,7 +194,7 @@ def train():
         return batch
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
-        wav2txt = wav2txt['train'].map(
+        wav2txt = train_data.map(
             remove_special_characters,
             remove_columns=[text_column_name],
             desc="remove special characters from datasets",
