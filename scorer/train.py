@@ -13,7 +13,6 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 
 import datasets
-import evaluate
 import numpy as np
 import torch
 from datasets import DatasetDict, load_dataset
@@ -35,6 +34,7 @@ from transformers.trainer_utils import get_last_checkpoint, is_main_process
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
 
+from scorer import evaluate
 from scorer.transformer.dataset import TranScorerDataTrainingArguments, TrainingArguments, DataCollatorCTCWithPadding
 from scorer.transformer.transcorer import TranScorerModelArguments
 
