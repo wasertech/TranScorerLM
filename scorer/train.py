@@ -168,9 +168,9 @@ def train():
             wav2txt["train"] = train_data.select(range(data_args.max_train_samples))
 
     if training_args.do_eval:
-        dev_files = glob(f"{str(data_path)}/**/*_dev.csv")
+        dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
         if not dev_files:
-            raise ValueError(f"No dev files found under {data_path}")
+            raise ValueError(f"No dev files found under {data_args.data_path}")
         wav2txt['eval'] = load_dataset('csv', data_files=dev_files)
         eval_data = wav2txt['eval']
 
