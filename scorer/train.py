@@ -147,6 +147,8 @@ def train():
             raise ValueError(f"No training files found under {data_args.data_path}")
         wav2txt['train'] = load_dataset('csv', data_files=train_files)
 
+        print(f"train_column_names={wav2txt['train'].column_names}")
+
         if data_args.audio_column_name not in wav2txt["train"].column_names:
             raise ValueError(
                 f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
