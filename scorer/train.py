@@ -348,7 +348,7 @@ def train():
     # via the `feature_extractor`
 
     raw_datasets = raw_datasets.cast_column(
-            data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
+            data_args.audio_column_name, datasets.features.Audio()
         )
 
     # make sure that dataset decodes audio with correct sampling rate
