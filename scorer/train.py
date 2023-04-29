@@ -320,7 +320,7 @@ def train():
     # via the `feature_extractor`
 
     # make sure that dataset decodes audio with correct sampling rate
-    dataset_sampling_rate = next(iter(wav2txt.values())).features[data_args.audio_column_name].sampling_rate
+    dataset_sampling_rate = 16_000 #next(iter(wav2txt.values())).features[data_args.audio_column_name].sampling_rate
     if dataset_sampling_rate != feature_extractor.sampling_rate:
         wav2txt = wav2txt.cast_column(
             data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
