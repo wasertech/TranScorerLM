@@ -55,9 +55,10 @@ def create_vocabulary_from_data(
 ):
     # Given training and test labels create vocabulary
     def extract_all_chars(batch):
-        print(batch.keys())
+        print(batch[0])
         all_text = " ".join(batch["transcript"])
         vocab = list(set(all_text))
+        print(vocab[0], all_text[0])
         return {"vocab": [vocab], "all_text": [all_text]}
 
     vocabs = datasets.map(
@@ -188,6 +189,7 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch, text_column_name="transcript", chars_to_ignore_regex="[\"\',\.\?\!\-\;\:«»]"):
+        print(batch[0])
         if batch[text_column_name] is None:
             # Return the batch unchanged if text_column_name is None
             return batch
@@ -202,7 +204,7 @@ def train():
 
         # Update the batch with the processed sentences
         batch[text_column_name] = processed_sentences
-
+        print(batch[0])
         return batch
 
 
