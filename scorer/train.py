@@ -276,7 +276,7 @@ def train():
             if not os.path.isfile(vocab_file):
                 os.makedirs(tokenizer_name_or_path, exist_ok=True)
                 vocab_dict = create_vocabulary_from_data(
-                    concatenate_datasets([train_wav2txt, dev_wav2txt]),
+                    DatasetDict({'train': train_wav2txt, 'eval': dev_wav2txt}),
                     word_delimiter_token=word_delimiter_token,
                     unk_token=unk_token,
                     pad_token=pad_token,
