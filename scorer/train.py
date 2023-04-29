@@ -150,7 +150,7 @@ def train():
 
         train_data = load_dataset('csv', data_files=train_files)
 
-        train_data = train_data.map(lambda example: {"wav_filename": os.path.join(os.path.dirname(example["path"]), example["wav_filename"])}, input_columns=["path", "wav_filename"])
+        train_data = train_data.map(lambda example: {"wav_filename": os.path.join(os.path.dirname(example["wav_filename"]), example["wav_filename"])}, input_columns=["path", "wav_filename"])
 
         wav2txt['train'] = train_data
         
