@@ -70,11 +70,9 @@ def create_vocabulary_from_data(
     )
 
     # take union of all unique characters in each dataset
-    # vocab_set = functools.reduce(
-    #     lambda vocab_1, vocab_2: set(vocab_1["vocab"][0]) | set(vocab_2["vocab"][0]), vocabs.values()
-    # )
-
-    # vocab_dict = {v: k for k, v in enumerate(sorted(vocab_set))}
+    vocab_set = functools.reduce(
+        lambda vocab_1, vocab_2: set(vocab_1["vocab"][0]) | set(vocab_2["vocab"][0]), vocabs.values()
+    )
 
     vocab_set = [v for v in vocab_set if isinstance(v, str)]
     vocab_dict = {v: k for k, v in enumerate(sorted(vocab_set))}
