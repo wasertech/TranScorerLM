@@ -364,6 +364,9 @@ def train():
         dev_wav2txt = dev_wav2txt.cast_column(
             data_args.audio_column_name, datasets.features.Audio(sampling_rate=dataset_sampling_rate)
         )
+    
+    _dataset = DatasetDict({'train': train_wav2txt, 'eval': dev_wav2txt})
+
     # derive max & min input length for sample rate & max duration
     max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
     min_input_length = data_args.min_duration_in_seconds * feature_extractor.sampling_rate
@@ -393,15 +396,15 @@ def train():
         return batch
 
     with training_args.main_process_first(desc="dataset map preprocessing"):
-        train_vectorized_datasets = train_wav2txt.map(
+        train_vectorized_datasets = _dataset['train'].map(
             prepare_dataset,
-            remove_columns=next(iter(train_wav2txt.values())).column_names,
+            remove_columns=next(iter(_dataset['train'].values())).column_names,
             num_proc=num_workers,
             desc="preprocess datasets",
         )
-        dev_vectorized_datasets = dev_wav2txt.map(
+        dev_vectorized_datasets = _dataset['eval'].map(
             prepare_dataset,
-            remove_columns=next(iter(dev_wav2txt.values())).column_names,
+            remove_columns=next(iter(_dataset['eval'].values())).column_names,
             num_proc=num_workers,
             desc="preprocess datasets",
         )
