@@ -304,26 +304,8 @@ def train():
     tokenizer = AutoTokenizer.from_pretrained(
         tokenizer_name_or_path,
         use_auth_token=data_args.use_auth_token,
-        force_download=True,
-        use_fast=False,
         **tokenizer_kwargs,
     )
-    # Get the current vocabulary
-    vocabulary = tokenizer.get_vocab()
-
-    # Add the '<s>' token with the correct index
-    # Fixes ValueError: Non-consecutive added token '<s>' found. Should have index 56 but has index 2 in saved vocabulary.
-    # TODO: find a better way to fix this
-    index = 56  # Replace with the expected index of '<s>'
-    tokenizer.cls_token = '<s>'
-    tokenizer.cls_token_id = index
-
-    # Remove the '<s>' token with index 2 from the vocabulary
-    vocabulary.pop('<s>', None)
-    vocabulary.pop('2', None)
-
-    # Update the tokenizer with the modified special tokens and vocabulary
-    tokenizer.set_vocab(vocabulary)
 
     feature_extractor = AutoFeatureExtractor.from_pretrained(
         model_args.model_name_or_path, cache_dir=model_args.cache_dir, use_auth_token=data_args.use_auth_token
