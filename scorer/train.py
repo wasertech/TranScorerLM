@@ -147,9 +147,10 @@ def train():
         train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
         if not train_files:
             raise ValueError(f"No training files found under {data_args.data_path}")
-        
+
         train_data = load_dataset('csv', data_files=train_files)
-        train_data = train_data.map(lambda example: {"wav_filename": os.path.join(os.path.dirname(example["wav_filename"]), example["wav_filename"])}, input_columns=["wav_filename"])        
+
+        train_data = train_data.map(lambda example: {"wav_filename": os.path.join(os.path.dirname(example["wav_filename"]), example["wav_filename"])}, input_columns=["wav_filename"])
         wav2txt['train'] = train_data
         
         if data_args.audio_column_name not in train_data.column_names['train']:
