@@ -304,6 +304,8 @@ def train():
     tokenizer = AutoTokenizer.from_pretrained(
         tokenizer_name_or_path,
         use_auth_token=data_args.use_auth_token,
+        force_download=True,
+        use_fast=False,
         **tokenizer_kwargs,
     )
     feature_extractor = AutoFeatureExtractor.from_pretrained(
