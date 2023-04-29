@@ -187,6 +187,10 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch, text_column_name="transcript", chars_to_ignore_regex="[\"\',\.\?\!\-\;\:«»]"):
+        if batch[text_column_name] is None:
+            # Return the batch unchanged if text_column_name is None
+            return batch
+
         # Process each sentence in the list separately
         processed_sentences = []
         for sentence in batch[text_column_name]:
@@ -196,9 +200,10 @@ def train():
                 processed_sentences.append(processed_sentence)
 
         # Update the batch with the processed sentences
-        batch["transcript"] = processed_sentences
+        batch[text_column_name] = processed_sentences
 
         return batch
+
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
         wav2txt = train_data.map(
