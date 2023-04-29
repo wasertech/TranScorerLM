@@ -142,8 +142,7 @@ def train():
     set_seed(training_args.seed)
 
     # 1. First, let's load the dataset
-    train_wav2txt = DatasetDict()
-    dev_wav2txt = DatasetDict()
+    raw_datasets = DatasetDict()
 
     if training_args.do_train:
         train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
@@ -165,7 +164,7 @@ def train():
 
             dataset_list.append(train_data['train'])
 
-        train_wav2txt = concatenate_datasets(dataset_list)
+        raw_datasets["train"] = concatenate_datasets(dataset_list)
         
         if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
@@ -182,7 +181,7 @@ def train():
             )
 
         if data_args.max_train_samples is not None:
-            train_wav2txt = train_wav2txt.select(range(data_args.max_train_samples))
+            raw_datasets["train"] = raw_datasets["train"].select(range(data_args.max_train_samples))
     
     if training_args.do_eval:
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
@@ -203,10 +202,10 @@ def train():
             )
             dataset_list.append(dev_data['train'])
 
-        dev_wav2txt = concatenate_datasets(dataset_list)
+        raw_datasets["eval"] = concatenate_datasets(dataset_list)
 
         if data_args.max_eval_samples is not None:
-            dev_wav2txt = dev_wav2txt.select(range(data_args.max_eval_samples))
+            raw_datasets["eval"] = raw_datasets["eval"].select(range(data_args.max_eval_samples))
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
@@ -232,7 +231,7 @@ def train():
 
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
-        train_wav2txt = train_wav2txt.map(
+        raw_datasets["train"] = raw_datasets["train"].map(
             remove_special_characters,
             # remove_columns=[text_column_name],
             desc="remove special characters from datasets",
@@ -276,7 +275,7 @@ def train():
             if not os.path.isfile(vocab_file):
                 os.makedirs(tokenizer_name_or_path, exist_ok=True)
                 vocab_dict = create_vocabulary_from_data(
-                    DatasetDict({'train': train_wav2txt, 'eval': dev_wav2txt}),
+                    raw_datasets,
                     word_delimiter_token=word_delimiter_token,
                     unk_token=unk_token,
                     pad_token=pad_token,
@@ -349,24 +348,12 @@ def train():
     # via the `feature_extractor`
 
     # make sure that dataset decodes audio with correct sampling rate
-    dataset_sampling_rate = 16_000 #next(iter(wav2txt.values())).features[data_args.audio_column_name].sampling_rate
+    dataset_sampling_rate = next(iter(raw_datasets.values())).features[data_args.audio_column_name].sampling_rate
     if dataset_sampling_rate != feature_extractor.sampling_rate:
-        train_wav2txt = train_wav2txt.cast_column(
+        raw_datasets = raw_datasets.cast_column(
             data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
-        )
-        dev_wav2txt = dev_wav2txt.cast_column(
-            data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
-        )
-    else:
-        train_wav2txt = train_wav2txt.cast_column(
-            data_args.audio_column_name, datasets.features.Audio(sampling_rate=dataset_sampling_rate)
-        )
-        dev_wav2txt = dev_wav2txt.cast_column(
-            data_args.audio_column_name, datasets.features.Audio(sampling_rate=dataset_sampling_rate)
         )
     
-    _dataset = DatasetDict({'train': train_wav2txt, 'eval': dev_wav2txt})
-
     # derive max & min input length for sample rate & max duration
     max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
     min_input_length = data_args.min_duration_in_seconds * feature_extractor.sampling_rate
@@ -396,29 +383,18 @@ def train():
         return batch
 
     with training_args.main_process_first(desc="dataset map preprocessing"):
-        train_vectorized_datasets = _dataset['train'].map(
+        vectorized_datasets = raw_datasets.map(
             prepare_dataset,
-            remove_columns=next(iter(_dataset['train'].values())).column_names,
+            remove_columns=next(iter(raw_datasets.values())).column_names,
             num_proc=num_workers,
             desc="preprocess datasets",
         )
-        dev_vectorized_datasets = _dataset['eval'].map(
-            prepare_dataset,
-            remove_columns=next(iter(_dataset['eval'].values())).column_names,
-            num_proc=num_workers,
-            desc="preprocess datasets",
-        )
-
+        
         def is_audio_in_length_range(length):
             return length > min_input_length and length < max_input_length
 
         # filter data that is shorter than min_input_length
-        train_vectorized_datasets = train_vectorized_datasets.filter(
-            is_audio_in_length_range,
-            num_proc=num_workers,
-            input_columns=["input_length"],
-        )
-        dev_vectorized_datasets = dev_vectorized_datasets.filter(
+        vectorized_datasets = vectorized_datasets.filter(
             is_audio_in_length_range,
             num_proc=num_workers,
             input_columns=["input_length"],
@@ -437,8 +413,7 @@ def train():
     # In a second step ``args.preprocessing_only`` can then be set to `False` to load the
     # cached dataset
     if data_args.preprocessing_only:
-        logger.info(f"Training data preprocessing finished. Files cached at {train_vectorized_datasets.cache_files}")
-        logger.info(f"Eval data preprocessing finished. Files cached at {dev_vectorized_datasets.cache_files}")
+        logger.info(f"Data preprocessing finished. Files cached at {vectorized_datasets.cache_files}")
         return
 
     def compute_metrics(pred):
@@ -483,8 +458,8 @@ def train():
         data_collator=data_collator,
         args=training_args,
         compute_metrics=compute_metrics,
-        train_dataset=train_vectorized_datasets if training_args.do_train else None,
-        eval_dataset=dev_vectorized_datasets if training_args.do_eval else None,
+        train_dataset=vectorized_datasets["train"] if training_args.do_train else None,
+        eval_dataset=vectorized_datasets["eval"] if training_args.do_eval else None,
         tokenizer=feature_extractor,
     )
 
@@ -507,9 +482,9 @@ def train():
         max_train_samples = (
             data_args.max_train_samples
             if data_args.max_train_samples is not None
-            else len(train_vectorized_datasets)
+            else len(vectorized_datasets["train"])
         )
-        metrics["train_samples"] = min(max_train_samples, len(train_vectorized_datasets))
+        metrics["train_samples"] = min(max_train_samples, len(vectorized_datasets["train"]))
 
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
@@ -521,9 +496,9 @@ def train():
         logger.info("*** Evaluate ***")
         metrics = trainer.evaluate()
         max_eval_samples = (
-            data_args.max_eval_samples if data_args.max_eval_samples is not None else len(dev_vectorized_datasets)
+            data_args.max_eval_samples if data_args.max_eval_samples is not None else len(vectorized_datasets["eval"])
         )
-        metrics["eval_samples"] = min(max_eval_samples, len(dev_vectorized_datasets))
+        metrics["eval_samples"] = min(max_eval_samples, len(vectorized_datasets["eval"]))
 
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
