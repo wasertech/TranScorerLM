@@ -315,9 +315,14 @@ def train():
     # Fixes ValueError: Non-consecutive added token '<s>' found. Should have index 56 but has index 2 in saved vocabulary.
     # TODO: find a better way to fix this
     index = 56  # Replace with the expected index of '<s>'
-    vocabulary['<s>'] = index
+    tokenizer.cls_token = '<s>'
+    tokenizer.cls_token_id = index
 
-    # Update the tokenizer with the modified vocabulary
+    # Remove the '<s>' token with index 2 from the vocabulary
+    vocabulary.pop('<s>', None)
+    vocabulary.pop('2', None)
+
+    # Update the tokenizer with the modified special tokens and vocabulary
     tokenizer.set_vocab(vocabulary)
 
     feature_extractor = AutoFeatureExtractor.from_pretrained(
