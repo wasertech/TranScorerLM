@@ -95,7 +95,7 @@ def get_absolute_wavpath(wavpath):
     wfn = wavpath['wav_filename']
     wfp = os.path.join(os.path.dirname(wfn), wfn)
     abs_wavpath = os.path.abspath(wfp)
-    wavpath = abs_wavpath
+    wavpath['wav_filename'] = abs_wavpath
     return wavpath
 
 def train():
