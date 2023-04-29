@@ -16,7 +16,7 @@ from typing import Dict, List, Optional, Union
 import datasets
 import numpy as np
 import torch
-from datasets import Audio, DatasetDict, load_dataset
+from datasets import DatasetDict, load_dataset
 
 import transformers
 from transformers import (
@@ -340,7 +340,8 @@ def train():
     def prepare_dataset(batch):
         # load audio
         sample = batch[audio_column_name]
-
+        print(sample)
+        
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
         batch["input_values"] = inputs.input_values[0]
         batch["input_length"] = len(batch["input_values"])
