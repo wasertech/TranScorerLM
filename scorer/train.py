@@ -91,7 +91,6 @@ def create_vocabulary_from_data(
 
     return vocab_dict
 
-
 def train():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
@@ -148,17 +147,20 @@ def train():
         train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
         if not train_files:
             raise ValueError(f"No training files found under {data_args.data_path}")
-        wav2txt['train'] = load_dataset('csv', data_files=train_files)
-        train_data = wav2txt['train']
-        print(train_data)
-        print(f"train_column_names={train_data.column_names['train']}")
-
+        
+        train_data = load_dataset('csv', data_files=train_files)
+        train_data = train_data.map(lambda row: {"wav_filename": os.path.join(os.path.dirname(row["wav_filename"]), row["wav_filename"].split("/")[-1])}, input_columns=["wav_filename"])
+        
+        wav2txt['train'] = train_data
+        
         if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
                 f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
                 " Make sure to set `--audio_column_name` to the correct audio column - one of"
                 f" {', '.join(train_data.column_names['train'])}."
             )
+
+
 
         if data_args.text_column_name not in train_data.column_names['train']:
             raise ValueError(
@@ -169,6 +171,8 @@ def train():
 
         if data_args.max_train_samples is not None:
             wav2txt["train"] = train_data.select(range(data_args.max_train_samples))
+        
+
 
     if training_args.do_eval:
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
