@@ -189,7 +189,6 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch):
-        print(batch)
         if batch[text_column_name] is None:
             # Return the batch unchanged if text_column_name is None
             return batch
@@ -200,7 +199,6 @@ def train():
             processed_sentence = re.sub(chars_to_ignore_regex, "", batch[text_column_name]).lower()
             batch[text_column_name] = processed_sentence
 
-        print(batch)
         return batch
 
 
