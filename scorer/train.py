@@ -142,7 +142,8 @@ def train():
     set_seed(training_args.seed)
 
     # 1. First, let's load the dataset
-    wav2txt = DatasetDict()
+    train_wav2txt = DatasetDict()
+    dev_wav2txt = DatasetDict()
 
     if training_args.do_train:
         train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
@@ -164,7 +165,7 @@ def train():
 
             dataset_list.append(train_data)
 
-        wav2txt['train'] = concatenate_datasets(dataset_list)
+        train_wav2txt = concatenate_datasets(dataset_list)
         
         if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
@@ -181,7 +182,7 @@ def train():
             )
 
         if data_args.max_train_samples is not None:
-            wav2txt["train"] = train_data.select(range(data_args.max_train_samples))
+            train_wav2txt = train_wav2txt.select(range(data_args.max_train_samples))
         
 
 
@@ -203,11 +204,11 @@ def train():
                 get_absolute_wavpath, desc="Mapping relative wav files to absolute path"
             )
             dataset_list.append(dev_data)
-            
-        wav2txt['eval'] = concatenate_datasets(dataset_list)
+
+        dev_wav2txt = concatenate_datasets(dataset_list)
 
         if data_args.max_eval_samples is not None:
-            wav2txt["eval"] = wav2txt['eval'].select(range(data_args.max_eval_samples))
+            dev_wav2txt = dev_wav2txt.select(range(data_args.max_eval_samples))
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
