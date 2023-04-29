@@ -91,6 +91,13 @@ def create_vocabulary_from_data(
 
     return vocab_dict
 
+def get_absolute_wavpath(wavpath):
+    wfn = wavpath['wav_filename']
+    wfp = os.path.join(os.path.dirname(wfn), wfn)
+    abs_wavpath = os.path.abspath(wfp)
+    wavpath = abs_wavpath
+    return wavpath
+
 def train():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
@@ -150,7 +157,7 @@ def train():
 
         train_data = load_dataset('csv', data_files=train_files)
 
-        train_data = train_data.map(lambda example: {"wav_filename": os.path.join(os.path.dirname(example["wav_filename"]), example["wav_filename"])}, input_columns=["wav_filename"])
+        train_data = train_data.map(get_absolute_wavpath, desc="relative wav files to absolute path")
 
         wav2txt['train'] = train_data
         
@@ -160,8 +167,6 @@ def train():
                 " Make sure to set `--audio_column_name` to the correct audio column - one of"
                 f" {', '.join(train_data.column_names['train'])}."
             )
-
-
 
         if data_args.text_column_name not in train_data.column_names['train']:
             raise ValueError(
