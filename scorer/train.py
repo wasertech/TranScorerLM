@@ -78,7 +78,7 @@ def create_vocabulary_from_data(
     vocab_dict = {v: k for k, v in enumerate(sorted(vocab_set))}
 
     # replace white space with delimiter token
-    if word_delimiter_token is not None:
+    if word_delimiter_token is not None and " " in vocab_dict:
         vocab_dict[word_delimiter_token] = vocab_dict[" "]
         del vocab_dict[" "]
 
