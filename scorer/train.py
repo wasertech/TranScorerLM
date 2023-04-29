@@ -58,7 +58,7 @@ def create_vocabulary_from_data(
         #print([key for key in batch.keys()])
         all_text = " ".join([text for text in batch["transcript"] if text is not None])
         vocab = list(set(all_text))
-        print(vocab[0], all_text[0])
+        #print(vocab[0], all_text[0])
         return {"vocab": [vocab], "all_text": [all_text]}
 
     vocabs = datasets.map(
