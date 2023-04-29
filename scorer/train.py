@@ -186,11 +186,17 @@ def train():
     )
     text_column_name = data_args.text_column_name
 
-    def remove_special_characters(batch):
-        if chars_to_ignore_regex is not None:
-            batch["transcript"] = re.sub(chars_to_ignore_regex, "", batch[text_column_name]).lower() + " "
-        else:
-            batch["transcript"] = batch[text_column_name].lower() + " "
+    def remove_special_characters(batch, text_column_name="transcript", chars_to_ignore_regex="[\"\',\.\?\!\-\;\:«»]"):
+        # Process each sentence in the list separately
+        processed_sentences = []
+        for sentence in batch[text_column_name]:
+            # Apply the regular expression substitution to each sentence
+            processed_sentence = re.sub(chars_to_ignore_regex, "", sentence).lower()
+            processed_sentences.append(processed_sentence)
+
+        # Update the batch with the processed sentences
+        batch["transcript"] = processed_sentences
+
         return batch
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
