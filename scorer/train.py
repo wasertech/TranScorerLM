@@ -355,7 +355,7 @@ def train():
     def prepare_dataset(batch):
         # load audio
         sample = batch[audio_column_name]
-        print(sample)
+        #print(sample)
 
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
         batch["input_values"] = inputs.input_values[0]
