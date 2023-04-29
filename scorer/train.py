@@ -325,7 +325,10 @@ def train():
         wav2txt = wav2txt.cast_column(
             data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
         )
-
+    else:
+        wav2txt = wav2txt.cast_column(
+            data_args.audio_column_name, datasets.features.Audio(sampling_rate=dataset_sampling_rate)
+        )
     # derive max & min input length for sample rate & max duration
     max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
     min_input_length = data_args.min_duration_in_seconds * feature_extractor.sampling_rate
@@ -341,7 +344,7 @@ def train():
         # load audio
         sample = batch[audio_column_name]
         print(sample)
-        
+
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
         batch["input_values"] = inputs.input_values[0]
         batch["input_length"] = len(batch["input_values"])
