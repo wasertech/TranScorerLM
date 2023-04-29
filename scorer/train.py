@@ -16,7 +16,7 @@ from typing import Dict, List, Optional, Union
 import datasets
 import numpy as np
 import torch
-from datasets import DatasetDict, load_dataset
+from datasets import DatasetDict, load_dataset, concatenate_datasets
 
 import transformers
 from transformers import (
@@ -91,13 +91,6 @@ def create_vocabulary_from_data(
 
     return vocab_dict
 
-def get_absolute_wavpath(wavpath):
-    wfn = wavpath['wav_filename']
-    wfp = os.path.join(os.path.dirname(wfn), wfn)
-    abs_wavpath = os.path.abspath(wfp)
-    wavpath['wav_filename'] = abs_wavpath
-    return wavpath
-
 def train():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
@@ -154,12 +147,21 @@ def train():
         train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
         if not train_files:
             raise ValueError(f"No training files found under {data_args.data_path}")
+        
+        dataset_list = []
+        for tf in train_files:
+            train_data = load_dataset('csv', data_files=[tf])
+            base_abs_path = os.path.abspath(os.path.dirname(tf))
+            
+            def get_absolute_wavpath(wavpath):
+                wfn = wavpath['wav_filename']
+                wfp = os.path.join(os.path.dirname(base_abs_path), wfn)
+                wavpath['wav_filename'] = wfp
+                return wavpath
+            
+            train_data = train_data.map(get_absolute_wavpath, desc="Mapping relative wav files to absolute path")
 
-        train_data = load_dataset('csv', data_files=train_files)
-
-        train_data = train_data.map(get_absolute_wavpath, desc="relative wav files to absolute path")
-
-        wav2txt['train'] = train_data
+            wav2txt['train'] = train_data
         
         if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
