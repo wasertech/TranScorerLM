@@ -162,7 +162,9 @@ def train():
             
             train_data = train_data.map(get_absolute_wavpath, desc="Mapping relative wav files to absolute path")
 
-            wav2txt['train'] = train_data
+            dataset_list.append(train_data)
+
+        wav2txt['train'] = concatenate_datasets(dataset_list)
         
         if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
@@ -187,11 +189,25 @@ def train():
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
         if not dev_files:
             raise ValueError(f"No dev files found under {data_args.data_path}")
-        wav2txt['eval'] = load_dataset('csv', data_files=dev_files)
-        eval_data = wav2txt['eval']
+        dataset_list = []
+        for df in dev_files:
+            dev_data = load_dataset('csv', data_files=[df])
+            
+            def get_absolute_wavpath(wavpath):
+                wfn = wavpath['wav_filename']
+                wfp = os.path.join(base_abs_path, wfn)
+                wavpath['wav_filename'] = wfp
+                return wavpath
+            
+            dev_data = dev_data.map(
+                get_absolute_wavpath, desc="Mapping relative wav files to absolute path"
+            )
+            dataset_list.append(dev_data)
+            
+        wav2txt['eval'] = concatenate_datasets(dataset_list)
 
         if data_args.max_eval_samples is not None:
-            wav2txt["eval"] = eval_data.select(range(data_args.max_eval_samples))
+            wav2txt["eval"] = wav2txt['eval'].select(range(data_args.max_eval_samples))
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
