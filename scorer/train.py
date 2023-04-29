@@ -339,7 +339,7 @@ def train():
     # We need to read the audio files as arrays and tokenize the targets.
     def prepare_dataset(batch):
         # load audio
-        sample = batch['audio']
+        sample = batch[audio_column_name]
 
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
         batch["input_values"] = inputs.input_values[0]
@@ -354,7 +354,6 @@ def train():
         return batch
 
     with training_args.main_process_first(desc="dataset map preprocessing"):
-        wav2txt = wav2txt.cast_column("audio", Audio())
         vectorized_datasets = wav2txt.map(
             prepare_dataset,
             remove_columns=next(iter(wav2txt.values())).column_names,
