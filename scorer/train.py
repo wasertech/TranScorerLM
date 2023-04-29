@@ -189,7 +189,7 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch, text_column_name="transcript", chars_to_ignore_regex="[\"\',\.\?\!\-\;\:«»]"):
-        print(batch[0])
+        print(batch)
         if batch[text_column_name] is None:
             # Return the batch unchanged if text_column_name is None
             return batch
@@ -204,7 +204,7 @@ def train():
 
         # Update the batch with the processed sentences
         batch[text_column_name] = processed_sentences
-        print(batch[0])
+        print(batch)
         return batch
 
 
