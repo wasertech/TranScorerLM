@@ -312,12 +312,14 @@ def train():
     vocabulary = tokenizer.get_vocab()
 
     # Add the '<s>' token with the correct index
+    # Fixes ValueError: Non-consecutive added token '<s>' found. Should have index 56 but has index 2 in saved vocabulary.
+    # TODO: find a better way to fix this
     index = 56  # Replace with the expected index of '<s>'
     vocabulary['<s>'] = index
 
     # Update the tokenizer with the modified vocabulary
     tokenizer.set_vocab(vocabulary)
-    
+
     feature_extractor = AutoFeatureExtractor.from_pretrained(
         model_args.model_name_or_path, cache_dir=model_args.cache_dir, use_auth_token=data_args.use_auth_token
     )
