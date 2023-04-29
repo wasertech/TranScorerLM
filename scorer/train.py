@@ -366,7 +366,7 @@ def train():
         if phoneme_language is not None:
             additional_kwargs["phonemizer_lang"] = phoneme_language
 
-        batch["labels"] = tokenizer(batch["target_text"], **additional_kwargs).input_ids
+        batch["labels"] = tokenizer(batch["transcript"], **additional_kwargs).input_ids
         return batch
 
     with training_args.main_process_first(desc="dataset map preprocessing"):
