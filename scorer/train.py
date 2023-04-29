@@ -67,7 +67,7 @@ def create_vocabulary_from_data(
         batched=True,
         batch_size=-1,
         keep_in_memory=True,
-        remove_columns=datasets["train"].column_names,
+        remove_columns=datasets.column_names,
     )
 
     # take union of all unique characters in each dataset
