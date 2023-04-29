@@ -188,7 +188,7 @@ def train():
     )
     text_column_name = data_args.text_column_name
 
-    def remove_special_characters(batch, text_column_name="transcript", chars_to_ignore_regex="[\"\',\.\?\!\-\;\:«»]"):
+    def remove_special_characters(batch):
         print(batch)
         if batch[text_column_name] is None:
             # Return the batch unchanged if text_column_name is None
