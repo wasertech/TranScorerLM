@@ -196,14 +196,15 @@ def train():
 
         # Process each sentence in the list separately
         processed_sentences = []
-        for sentence in batch[text_column_name]:
+        for sentence in :
             if sentence is not None:
                 # Apply the regular expression substitution to each sentence
-                processed_sentence = re.sub(chars_to_ignore_regex, "", sentence).lower()
-                processed_sentences.append(processed_sentence)
+                processed_sentence = re.sub(chars_to_ignore_regex, "", batch[text_column_name]).lower()
+                #processed_sentences.append(processed_sentence)
 
         # Update the batch with the processed sentences
-        batch[text_column_name] = processed_sentences
+        batch[text_column_name] = processed_sentence
+        
         print(batch)
         return batch
 
