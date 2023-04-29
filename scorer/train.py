@@ -55,8 +55,8 @@ def create_vocabulary_from_data(
 ):
     # Given training and test labels create vocabulary
     def extract_all_chars(batch):
-        print([key for key in batch.keys()])
-        all_text = " ".join(batch["target_text"])
+        #print([key for key in batch.keys()])
+        all_text = " ".join(batch["transcript"])
         vocab = list(set(all_text))
         print(vocab[0], all_text[0])
         return {"vocab": [vocab], "all_text": [all_text]}
