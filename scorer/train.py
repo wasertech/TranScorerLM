@@ -155,10 +155,11 @@ def train():
             
             def get_absolute_wavpath(wavpath):
                 wfn = wavpath['wav_filename']
-                wfp = os.path.join(os.path.dirname(base_abs_path), wfn)
+                wfp = os.path.join(base_abs_path, wfn)
                 wavpath['wav_filename'] = wfp
                 return wavpath
             
+
             train_data = train_data.map(get_absolute_wavpath, desc="Mapping relative wav files to absolute path")
 
             wav2txt['train'] = train_data
