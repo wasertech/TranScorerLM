@@ -182,7 +182,10 @@ def train():
             raw_datasets["train"] = raw_datasets["train"].select(range(data_args.max_train_samples))
     
         # Filter raw_datasets['train'] to only include row with transcript not None
-        raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row["transcript"] not in [None, "", " ", "\n"])
+        raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
+
+    print("Raw train dataset")
+    print(f"{raw_datasets['train'][0:3]}")
 
     if training_args.do_eval:
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
@@ -209,7 +212,10 @@ def train():
             raw_datasets["eval"] = raw_datasets["eval"].select(range(data_args.max_eval_samples))
         
         # Filter raw_datasets['eval'] to only include row with transcript not None
-        raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row["transcript"] not in [None, "", " ", "\n"])
+        raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
+
+    print("Raw evaluation dataset")
+    print(f"{raw_datasets['eval'][0:3]}")
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
@@ -236,6 +242,9 @@ def train():
     word_delimiter_token = data_args.word_delimiter_token
     unk_token = data_args.unk_token
     pad_token = data_args.pad_token
+
+    print("Training dataset without special characters")
+    print(f"{raw_datasets['train'][0:3]}")
 
     # 3. Next, let's load the config as we might need it to create
     # the tokenizer
@@ -275,7 +284,7 @@ def train():
                     unk_token=unk_token,
                     pad_token=pad_token,
                 )
-
+                print(f"{vocab_dict=}")
                 # save vocab dict to be loaded into tokenizer
                 with open(vocab_file, "w") as file:
                     json.dump(vocab_dict, file)
@@ -345,6 +354,9 @@ def train():
     raw_datasets = raw_datasets.cast_column(
             data_args.audio_column_name, datasets.features.Audio()
         )
+    
+    print("Training dataset with audio loaded")
+    print(raw_datasets['train'][0:3])
 
     # make sure that dataset decodes audio with correct sampling rate
     dataset_sampling_rate = next(iter(raw_datasets.values())).features[data_args.audio_column_name].sampling_rate
@@ -353,6 +365,9 @@ def train():
             data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
         )
     
+    print("Training dataset with audio loaded at 16khz")
+    print(raw_datasets['train'][0:3])
+
     # derive max & min input length for sample rate & max duration
     max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
     min_input_length = data_args.min_duration_in_seconds * feature_extractor.sampling_rate
@@ -388,7 +403,8 @@ def train():
             num_proc=num_workers,
             desc="preprocess datasets",
         )
-        
+        print("Vectorized datasets")
+        print(f"{vectorized_datasets=}")
         def is_audio_in_length_range(length):
             return length > min_input_length and length < max_input_length
 
@@ -398,6 +414,8 @@ def train():
             num_proc=num_workers,
             input_columns=["input_length"],
         )
+        print("Filtered vectorized datasets by audio length range")
+        print(f"{vectorized_datasets=}")
 
     # 7. Next, we can prepare the training.
     # Let's use word error rate (WER) as our evaluation metric,
