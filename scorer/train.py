@@ -398,6 +398,7 @@ def train():
     # Preprocessing the datasets.
     # We need to read the audio files as arrays and tokenize the targets.
     def prepare_dataset(batch):
+        print(batch)
         # load audio
         samples = [b["audio"] for b in batch]
 
