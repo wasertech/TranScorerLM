@@ -404,7 +404,7 @@ def train():
 
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
         batch["input_values"][0] = inputs.input_values[0]
-        batch["input_length"][0] = len(batch[0]["input_values"])
+        batch["input_length"][0] = len(batch["input_values"][0])
 
         # encode targets
         additional_kwargs = {}
