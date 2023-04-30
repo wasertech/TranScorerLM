@@ -399,7 +399,7 @@ def train():
     # We need to read the audio files as arrays and tokenize the targets.
     def prepare_dataset(batch):
         # load audio
-        samples = [b[audio_column_name] for b in batch]
+        samples = [b["audio"] for b in batch]
 
         inputs = feature_extractor([s["array"] for s in samples], sampling_rate=samples[0]["sampling_rate"])
         input_values = [i.input_values for i in inputs]
