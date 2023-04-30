@@ -403,15 +403,15 @@ def train():
         print(sample)
 
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
-        batch["input_values"][0] = inputs.input_values[0]
-        batch["input_length"][0] = len(batch["input_values"][0])
+        batch["input_values"] = inputs.input_values[0]
+        batch["input_length"] = len(batch["input_values"])
 
         # encode targets
         additional_kwargs = {}
         if phoneme_language is not None:
             additional_kwargs["phonemizer_lang"] = phoneme_language
 
-        batch["labels"][0] = tokenizer(batch["target_text"][0], **additional_kwargs).input_ids
+        batch["labels"] = tokenizer(batch["target_text"][0], **additional_kwargs).input_ids
         return batch
 
     batch_size = 1
