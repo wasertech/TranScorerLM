@@ -374,7 +374,7 @@ def train():
         )
     
     print("Training dataset with audio loaded")
-    print(raw_datasets['train'][0:3])
+    print(raw_datasets['train'][0])
 
     # make sure that dataset decodes audio with correct sampling rate
     dataset_sampling_rate = next(iter(raw_datasets.values())).features[data_args.audio_column_name].sampling_rate
@@ -384,7 +384,7 @@ def train():
         )
     
     print("Training dataset with audio loaded at 16khz")
-    print(raw_datasets['train'][0:3])
+    print(raw_datasets['train'][0])
 
     # derive max & min input length for sample rate & max duration
     max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
@@ -465,13 +465,16 @@ def train():
 
         return metrics
 
+    print("Saving...", end="")
     # Now save everything to be able to create a single processor later
     if is_main_process(training_args.local_rank):
         # save feature extractor, tokenizer and config
         feature_extractor.save_pretrained(training_args.output_dir)
         tokenizer.save_pretrained(training_args.output_dir)
         config.save_pretrained(training_args.output_dir)
+    print("Done")
 
+    print("Creating processor")
     try:
         processor = AutoProcessor.from_pretrained(training_args.output_dir)
     except (OSError, KeyError):
@@ -485,9 +488,11 @@ def train():
         processor = Wav2Vec2Processor.from_pretrained(training_args.output_dir)
 
     # Instantiate custom data collator
+    print("Creating data collator")
     data_collator = DataCollatorCTCWithPadding(processor=processor)
 
     # Initialize Trainer
+    print("Initializing trainer")
     trainer = Trainer(
         model=model,
         data_collator=data_collator,
@@ -497,6 +502,8 @@ def train():
         eval_dataset=vectorized_datasets["eval"] if training_args.do_eval else None,
         tokenizer=feature_extractor,
     )
+
+    print("Ready to train")
 
     # 8. Finally, we can start training
 
