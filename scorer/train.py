@@ -213,11 +213,12 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch):
-        if chars_to_ignore_regex is not None:
-            batch["target_text"] = re.sub(chars_to_ignore_regex, "", batch[text_column_name]).lower() + " "
-        else:
-            batch["target_text"] = batch[text_column_name].lower() + " "
-        return batch
+        if batch[text_column_name]:
+            if chars_to_ignore_regex is not None:
+                batch["target_text"] = re.sub(chars_to_ignore_regex, "", str(batch[text_column_name])).lower() + " "
+            else:
+                batch["target_text"] = batch[text_column_name].lower() + " "
+            return batch
 
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
