@@ -401,8 +401,8 @@ def train():
         # load audio
         samples = [b[audio_column_name] for b in batch]
 
-        inputs = feature_extractor(samples["array"], sampling_rate=samples["sampling_rate"])
-        input_values = [i.input_values[0] for i in inputs]
+        inputs = feature_extractor([s["array"] for s in samples], sampling_rate=samples[0]["sampling_rate"])
+        input_values = [i.input_values for i in inputs]
         input_lengths = [len(i) for i in input_values]
 
         # encode targets
