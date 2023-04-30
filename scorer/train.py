@@ -417,8 +417,10 @@ def train():
     with training_args.main_process_first(desc="dataset map preprocessing"):
         vectorized_datasets = raw_datasets.map(
             prepare_dataset,
-            #remove_columns=next(iter(raw_datasets.values())).column_names,
+            remove_columns=next(iter(raw_datasets.values())).column_names,
             num_proc=num_workers,
+            batched=True,
+            batch_size=32,
             desc="preprocess datasets",
         )
         print("Vectorized datasets")
@@ -430,6 +432,8 @@ def train():
         vectorized_datasets = vectorized_datasets.filter(
             is_audio_in_length_range,
             num_proc=num_workers,
+            batched=True,
+            batch_size=32,
             input_columns=["input_length"],
         )
         print("Filtered vectorized datasets by audio length range")
