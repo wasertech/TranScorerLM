@@ -60,6 +60,8 @@ def create_vocabulary_from_data(
         vocab = list(set(all_text))
         return {"vocab": [vocab], "all_text": [all_text]}
 
+    print(f"Removing columns: {datasets["train"].column_names}")
+
     vocabs = datasets.map(
         extract_all_chars,
         batched=True,
