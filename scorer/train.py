@@ -412,7 +412,7 @@ def train():
             additional_kwargs["phonemizer_lang"] = phoneme_language
 
         batch["labels"] = tokenizer(batch["target_text"][0], **additional_kwargs).input_ids
-        return batch
+        return batch[0]
 
     batch_size = 1
     vectorized_datasets = raw_datasets.map(
