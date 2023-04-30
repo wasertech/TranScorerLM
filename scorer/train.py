@@ -400,7 +400,7 @@ def train():
     def prepare_dataset(batch):
         # load audio
         sample = batch[audio_column_name]
-        #print(sample)
+        print(sample)
 
         inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
         batch["input_values"] = inputs.input_values[0]
@@ -420,7 +420,7 @@ def train():
             remove_columns=next(iter(raw_datasets.values())).column_names,
             num_proc=num_workers,
             batched=True,
-            batch_size=32,
+            batch_size=1,
             desc="preprocess datasets",
         )
         print("Vectorized datasets")
@@ -433,7 +433,7 @@ def train():
             is_audio_in_length_range,
             num_proc=num_workers,
             batched=True,
-            batch_size=32,
+            batch_size=1,
             input_columns=["input_length"],
         )
         print("Filtered vectorized datasets by audio length range")
