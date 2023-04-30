@@ -181,6 +181,9 @@ def train():
         if data_args.max_train_samples is not None:
             raw_datasets["train"] = raw_datasets["train"].select(range(data_args.max_train_samples))
     
+        # Filter raw_datasets['train'] to only include row with transcript not None
+        raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row["transcript"] not in [None, "", " ", "\n"])
+
     if training_args.do_eval:
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
         if not dev_files:
@@ -204,6 +207,9 @@ def train():
 
         if data_args.max_eval_samples is not None:
             raw_datasets["eval"] = raw_datasets["eval"].select(range(data_args.max_eval_samples))
+        
+        # Filter raw_datasets['eval'] to only include row with transcript not None
+        raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row["transcript"] not in [None, "", " ", "\n"])
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
@@ -213,13 +219,11 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch):
-        if batch[text_column_name]:
-            if chars_to_ignore_regex is not None:
-                batch["target_text"] = re.sub(chars_to_ignore_regex, "", str(batch[text_column_name])).lower() + " "
-            else:
-                batch["target_text"] = batch[text_column_name].lower() + " "
+        if chars_to_ignore_regex is not None:
+            batch["target_text"] = re.sub(chars_to_ignore_regex, "", str(batch[text_column_name])).lower() + " "
+        else:
+            batch["target_text"] = batch[text_column_name].lower() + " "
         return batch
-
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
         raw_datasets["train"] = raw_datasets["train"].map(
