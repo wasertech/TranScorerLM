@@ -56,10 +56,8 @@ def create_vocabulary_from_data(
 ):
     # Given training and test labels create vocabulary
     def extract_all_chars(batch):
-        #print([key for key in batch.keys()])
-        all_text = " ".join([text for text in batch["transcript"] if text is not None])
+        all_text = " ".join(batch["target_text"])
         vocab = list(set(all_text))
-        #print(vocab[0], all_text[0])
         return {"vocab": [vocab], "all_text": [all_text]}
 
     vocabs = datasets.map(
@@ -217,16 +215,10 @@ def train():
     text_column_name = data_args.text_column_name
 
     def remove_special_characters(batch):
-        if batch[text_column_name] is None:
-            # Return the batch unchanged if text_column_name is None
-            return batch
-
-        # Process each sentence in the list separately
-        if batch[text_column_name] is not None:
-            # Apply the regular expression substitution to each sentence
-            processed_sentence = re.sub(chars_to_ignore_regex, "", batch[text_column_name]).lower()
-            batch[text_column_name] = processed_sentence
-
+        if chars_to_ignore_regex is not None:
+            batch["target_text"] = re.sub(chars_to_ignore_regex, "", batch[text_column_name]).lower() + " "
+        else:
+            batch["target_text"] = batch[text_column_name].lower() + " "
         return batch
 
 
