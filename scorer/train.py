@@ -399,45 +399,48 @@ def train():
     # We need to read the audio files as arrays and tokenize the targets.
     def prepare_dataset(batch):
         # load audio
-        sample = batch[audio_column_name]
-        print(sample)
+        samples = [b[audio_column_name] for b in batch]
 
-        inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
-        batch["input_values"] = inputs.input_values[0]
-        batch["input_length"] = len(batch["input_values"])
+        inputs = feature_extractor(samples["array"], sampling_rate=samples["sampling_rate"])
+        input_values = [i.input_values[0] for i in inputs]
+        input_lengths = [len(i) for i in input_values]
 
         # encode targets
         additional_kwargs = {}
         if phoneme_language is not None:
             additional_kwargs["phonemizer_lang"] = phoneme_language
 
-        batch["labels"] = tokenizer(batch["target_text"], **additional_kwargs).input_ids
-        return batch
+        targets = [b["target_text"] for b in batch]
+        labels = tokenizer(targets, **additional_kwargs).input_ids
 
-    with training_args.main_process_first(desc="dataset map preprocessing"):
-        vectorized_datasets = raw_datasets.map(
-            prepare_dataset,
-            remove_columns=next(iter(raw_datasets.values())).column_names,
-            num_proc=num_workers,
-            batched=True,
-            batch_size=1,
-            desc="preprocess datasets",
-        )
-        print("Vectorized datasets")
-        print(f"{vectorized_datasets=}")
-        def is_audio_in_length_range(length):
-            return length > min_input_length and length < max_input_length
+        return {"input_values": input_values, "input_length": input_lengths, "labels": labels}
 
-        # filter data that is shorter than min_input_length
-        vectorized_datasets = vectorized_datasets.filter(
-            is_audio_in_length_range,
-            num_proc=num_workers,
-            batched=True,
-            batch_size=1,
-            input_columns=["input_length"],
-        )
-        print("Filtered vectorized datasets by audio length range")
-        print(f"{vectorized_datasets=}")
+    batch_size = 32
+    vectorized_datasets = raw_datasets.map(
+        prepare_dataset,
+        batched=True,
+        batch_size=batch_size,
+        remove_columns=next(iter(raw_datasets.values())).column_names,
+        num_proc=num_workers,
+        desc="preprocess datasets",
+    )
+    print("Vectorized datasets")
+    print(f"{vectorized_datasets=}")
+
+    def is_audio_in_length_range(batch):
+        return [length > min_input_length and length < max_input_length for length in batch["input_length"]]
+
+    # filter data that is shorter than min_input_length
+    vectorized_datasets = vectorized_datasets.filter(
+        is_audio_in_length_range,
+        num_proc=num_workers,
+        batched=True,
+        batch_size=batch_size,
+        input_columns=["input_length"],
+        desc="preprocess datasets",
+    )
+    print("Filtered vectorized datasets by audio length range")
+    print(f"{vectorized_datasets=}")
 
     # 7. Next, we can prepare the training.
     # Let's use word error rate (WER) as our evaluation metric,
