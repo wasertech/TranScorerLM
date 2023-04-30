@@ -65,7 +65,7 @@ def create_vocabulary_from_data(
         batched=True,
         batch_size=-1,
         keep_in_memory=True,
-        #remove_columns=datasets["train"].column_names,
+        remove_columns=datasets["train"].column_names,
     )
 
     # take union of all unique characters in each dataset
@@ -384,7 +384,7 @@ def train():
     with training_args.main_process_first(desc="dataset map preprocessing"):
         vectorized_datasets = raw_datasets.map(
             prepare_dataset,
-            remove_columns=next(iter(raw_datasets.values())).column_names,
+            #remove_columns=next(iter(raw_datasets.values())).column_names,
             num_proc=num_workers,
             desc="preprocess datasets",
         )
