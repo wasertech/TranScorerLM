@@ -398,25 +398,22 @@ def train():
     # Preprocessing the datasets.
     # We need to read the audio files as arrays and tokenize the targets.
     def prepare_dataset(batch):
-        print(batch)
         # load audio
-        samples = [b["audio"] for b in batch]
+        sample = batch[audio_column_name]
 
-        inputs = feature_extractor([s["array"] for s in samples], sampling_rate=samples[0]["sampling_rate"])
-        input_values = [i.input_values for i in inputs]
-        input_lengths = [len(i) for i in input_values]
+        inputs = feature_extractor(sample["array"], sampling_rate=sample["sampling_rate"])
+        batch["input_values"] = inputs.input_values[0]
+        batch["input_length"] = len(batch["input_values"])
 
         # encode targets
         additional_kwargs = {}
         if phoneme_language is not None:
             additional_kwargs["phonemizer_lang"] = phoneme_language
 
-        targets = [b["target_text"] for b in batch]
-        labels = tokenizer(targets, **additional_kwargs).input_ids
+        batch["labels"] = tokenizer(batch["target_text"], **additional_kwargs).input_ids
+        return batch
 
-        return {"input_values": input_values, "input_length": input_lengths, "labels": labels}
-
-    batch_size = 32
+    batch_size = 1
     vectorized_datasets = raw_datasets.map(
         prepare_dataset,
         batched=True,
