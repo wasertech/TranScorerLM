@@ -195,7 +195,7 @@ def train():
         raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
 
     print("Raw train dataset")
-    print(f"{raw_datasets['train'][0:3]}")
+    print(f"{raw_datasets['train'][0]}")
 
     if training_args.do_eval:
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
@@ -225,7 +225,7 @@ def train():
         raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
 
     print("Raw evaluation dataset")
-    print(f"{raw_datasets['eval'][0:3]}")
+    print(f"{raw_datasets['eval'][0]}")
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
@@ -247,6 +247,11 @@ def train():
             remove_columns=[text_column_name],
             desc="remove special characters from datasets",
         )
+        raw_datasets["eval"] = raw_datasets["eval"].map(
+            remove_special_characters,
+            remove_columns=[text_column_name],
+            desc="remove special characters from datasets",
+        )
 
     # save special tokens for tokenizer
     word_delimiter_token = data_args.word_delimiter_token
@@ -254,7 +259,10 @@ def train():
     pad_token = data_args.pad_token
 
     print("Training dataset without special characters")
-    print(f"{raw_datasets['train'][0:3]}")
+    print(f"{raw_datasets['train'][0]}")
+
+    print("Evaluation dataset without special characters")
+    print(f"{raw_datasets['eval'][0]}")
 
     # 3. Next, let's load the config as we might need it to create
     # the tokenizer
