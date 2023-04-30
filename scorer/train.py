@@ -412,13 +412,10 @@ def train():
             additional_kwargs["phonemizer_lang"] = phoneme_language
 
         batch["labels"] = tokenizer(batch["target_text"][0], **additional_kwargs).input_ids
-        return batch[0]
+        return batch
 
-    batch_size = 1
     vectorized_datasets = raw_datasets.map(
         prepare_dataset,
-        batched=True,
-        batch_size=batch_size,
         remove_columns=next(iter(raw_datasets.values())).column_names,
         num_proc=num_workers,
         desc="preprocess datasets",
@@ -433,8 +430,6 @@ def train():
     vectorized_datasets = vectorized_datasets.filter(
         is_audio_in_length_range,
         num_proc=num_workers,
-        batched=True,
-        batch_size=batch_size,
         input_columns=["input_length"],
         desc="preprocess datasets",
     )
