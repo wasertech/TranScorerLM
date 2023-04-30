@@ -68,13 +68,20 @@ def create_vocabulary_from_data(
         remove_columns=datasets["train"].column_names,
     )
 
+    print(f"{vocabs=}")
+
     # take union of all unique characters in each dataset
     vocab_set = functools.reduce(
         lambda vocab_1, vocab_2: set(vocab_1["vocab"][0]) | set(vocab_2["vocab"][0]), vocabs.values()
     )
 
+    print(f"{vocab_set=}")
+
     vocab_set = [v for v in vocab_set if isinstance(v, str)]
     vocab_dict = {v: k for k, v in enumerate(sorted(vocab_set))}
+
+    print(f"{vocab_set=}")
+    print(f"{vocab_dict=}")
 
     # replace white space with delimiter token
     if word_delimiter_token is not None and " " in vocab_dict:
@@ -88,6 +95,7 @@ def create_vocabulary_from_data(
     if pad_token is not None:
         vocab_dict[pad_token] = len(vocab_dict)
 
+    print(f"{vocab_dict=}")
     return vocab_dict
 
 def train():
