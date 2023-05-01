@@ -220,8 +220,6 @@ def train():
 
             print(f"{dev_data['train'][0]=}")
 
-            exit(4)
-
             dataset_list.append(dev_data['train'])
 
         raw_datasets["eval"] = concatenate_datasets(dataset_list)
