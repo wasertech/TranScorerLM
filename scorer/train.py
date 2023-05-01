@@ -206,7 +206,8 @@ def train():
         dataset_list = []
         for df in dev_files:
             dev_data = load_dataset('csv', data_files=[df])
-            
+            base_abs_path = os.path.abspath(os.path.dirname(df))
+
             def get_absolute_wavpath(wavpath):
                 wfn = wavpath['wav_filename']
                 wfp = os.path.join(base_abs_path, wfn)
