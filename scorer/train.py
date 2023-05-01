@@ -170,8 +170,6 @@ def train():
             
             train_data = train_data.map(get_absolute_wavpath, desc="Mapping relative wav files to absolute path")
 
-            print(f"{train_data['train'][0]=}")
-
             dataset_list.append(train_data['train'])
 
         raw_datasets["train"] = concatenate_datasets(dataset_list)
@@ -217,9 +215,6 @@ def train():
             dev_data = dev_data.map(
                 get_absolute_wavpath, desc="Mapping relative wav files to absolute path"
             )
-
-            print(f"{dev_data['train'][0]=}")
-            exit(4)
 
             dataset_list.append(dev_data['train'])
 
