@@ -424,10 +424,8 @@ def train():
     print("Vectorized datasets")
     print(f"{vectorized_datasets=}")
 
-    def is_audio_in_length_range(batch):
-        print(batch)
-        exit(4)
-        return [length > min_input_length and length < max_input_length for length in batch["input_length"]]
+    def is_audio_in_length_range(length):
+            return length > min_input_length and length < max_input_length
 
     # filter data that is shorter than min_input_length
     vectorized_datasets = vectorized_datasets.filter(
