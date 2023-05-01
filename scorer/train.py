@@ -331,6 +331,7 @@ def train():
     tokenizer = AutoTokenizer.from_pretrained(
         tokenizer_name_or_path,
         use_auth_token=data_args.use_auth_token,
+        cache_dir=model_args.cache_dir,
         **tokenizer_kwargs,
     )
 
