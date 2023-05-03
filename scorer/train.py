@@ -248,16 +248,18 @@ def train():
         return batch
 
     with training_args.main_process_first(desc="dataset map special characters removal"):
-        raw_datasets["train"] = raw_datasets["train"].map(
-            remove_special_characters,
-            remove_columns=[text_column_name],
-            desc="remove special characters from datasets",
-        )
-        raw_datasets["eval"] = raw_datasets["eval"].map(
-            remove_special_characters,
-            remove_columns=[text_column_name],
-            desc="remove special characters from datasets",
-        )
+        if training_args.do_train:
+            raw_datasets["train"] = raw_datasets["train"].map(
+                remove_special_characters,
+                remove_columns=[text_column_name],
+                desc="remove special characters from datasets",
+            )
+        if training_args.do_eval:
+            raw_datasets["eval"] = raw_datasets["eval"].map(
+                remove_special_characters,
+                remove_columns=[text_column_name],
+                desc="remove special characters from datasets",
+            )
 
     # save special tokens for tokenizer
     word_delimiter_token = data_args.word_delimiter_token
