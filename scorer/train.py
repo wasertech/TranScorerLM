@@ -60,7 +60,7 @@ def create_vocabulary_from_data(
         vocab = list(set(all_text))
         return {"vocab": [vocab], "all_text": [all_text]}
 
-    print(f"Removing columns: {datasets['train'].column_names}")
+    #print(f"Removing columns: {datasets['train'].column_names}")
 
     vocabs = datasets.map(
         extract_all_chars,
@@ -70,20 +70,20 @@ def create_vocabulary_from_data(
         remove_columns=datasets["train"].column_names,
     )
 
-    print(f"{vocabs=}")
+    #print(f"{vocabs=}")
 
     # take union of all unique characters in each dataset
     vocab_set = functools.reduce(
         lambda vocab_1, vocab_2: set(vocab_1["vocab"][0]) | set(vocab_2["vocab"][0]), vocabs.values()
     )
 
-    print(f"{vocab_set=}")
+    #print(f"{vocab_set=}")
 
     vocab_set = [v for v in vocab_set if isinstance(v, str)]
     vocab_dict = {v: k for k, v in enumerate(sorted(vocab_set))}
 
-    print(f"{vocab_set=}")
-    print(f"{vocab_dict=}")
+    #print(f"{vocab_set=}")
+    #print(f"{vocab_dict=}")
 
     # replace white space with delimiter token
     if word_delimiter_token is not None and " " in vocab_dict:
@@ -97,7 +97,7 @@ def create_vocabulary_from_data(
     if pad_token is not None:
         vocab_dict[pad_token] = len(vocab_dict)
 
-    print(f"{vocab_dict=}")
+    #print(f"{vocab_dict=}")
     return vocab_dict
 
 def train():
@@ -170,7 +170,7 @@ def train():
             
             train_data = train_data.map(get_absolute_wavpath, desc="Mapping relative wav files to absolute path")
 
-            print(f"{train_data['train'][0]=}")
+            #print(f"{train_data['train'][0]=}")
 
             dataset_list.append(train_data['train'])
 
@@ -196,8 +196,8 @@ def train():
         # Filter raw_datasets['train'] to only include row with transcript not None
         raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
 
-    print("Raw train dataset")
-    print(f"{raw_datasets['train'][0]}")
+        #print("Raw train dataset")
+        #print(f"{raw_datasets['train'][0]}")
 
     if training_args.do_eval:
         dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
@@ -218,7 +218,7 @@ def train():
                 get_absolute_wavpath, desc="Mapping relative wav files to absolute path"
             )
 
-            print(f"{dev_data['train'][0]=}")
+            #print(f"{dev_data['train'][0]=}")
 
             dataset_list.append(dev_data['train'])
 
@@ -230,8 +230,8 @@ def train():
         # Filter raw_datasets['eval'] to only include row with transcript not None
         raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
 
-    print("Raw evaluation dataset")
-    print(f"{raw_datasets['eval'][0]}")
+        #print("Raw evaluation dataset")
+        #print(f"{raw_datasets['eval'][0]}")
 
     # 2. We remove some special characters from the datasets
     # that make training complicated and do not help in transcribing the speech
@@ -264,11 +264,11 @@ def train():
     unk_token = data_args.unk_token
     pad_token = data_args.pad_token
 
-    print("Training dataset without special characters")
-    print(f"{raw_datasets['train'][0]}")
+    # print("Training dataset without special characters")
+    # print(f"{raw_datasets['train'][0]}")
 
-    print("Evaluation dataset without special characters")
-    print(f"{raw_datasets['eval'][0]}")
+    # print("Evaluation dataset without special characters")
+    # print(f"{raw_datasets['eval'][0]}")
 
     # 3. Next, let's load the config as we might need it to create
     # the tokenizer
@@ -308,7 +308,7 @@ def train():
                     unk_token=unk_token,
                     pad_token=pad_token,
                 )
-                print(f"{vocab_dict=}")
+                # print(f"{vocab_dict=}")
                 # save vocab dict to be loaded into tokenizer
                 with open(vocab_file, "w") as file:
                     json.dump(vocab_dict, file)
@@ -380,8 +380,8 @@ def train():
             data_args.audio_column_name, datasets.features.Audio()
         )
     
-    print("Training dataset with audio loaded")
-    print(raw_datasets['train'][0])
+    # print("Training dataset with audio loaded")
+    # print(raw_datasets['train'][0])
 
     # make sure that dataset decodes audio with correct sampling rate
     dataset_sampling_rate = next(iter(raw_datasets.values())).features[data_args.audio_column_name].sampling_rate
@@ -390,8 +390,8 @@ def train():
             data_args.audio_column_name, datasets.features.Audio(sampling_rate=feature_extractor.sampling_rate)
         )
     
-    print("Training dataset with audio loaded at 16khz")
-    print(raw_datasets['train'][0])
+    # print("Training dataset with audio loaded at 16khz")
+    # print(raw_datasets['train'][0])
 
     # derive max & min input length for sample rate & max duration
     max_input_length = data_args.max_duration_in_seconds * feature_extractor.sampling_rate
