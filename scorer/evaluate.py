@@ -30,7 +30,7 @@ def map_to_pred(batch):
     pred_ids = torch.argmax(logits, dim=-1)
     batch["predicted"] = processor.batch_decode(pred_ids)
     batch["target"] = batch["transcript"][0]
-    return batch
+    return batch[0]
 
 
 def main():
