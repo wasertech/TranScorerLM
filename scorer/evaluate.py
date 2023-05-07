@@ -32,7 +32,7 @@ def map_to_pred(batch):
 
     if getattr(batch, "target", None) is None:
         batch['target'] = []
-    batch['target'].append(batch['transcript'][0])
+    batch['target'].append(re.sub(chars_to_ignore_regex, '', batch['transcript'][0]))
     return batch
 
 
