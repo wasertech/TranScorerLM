@@ -29,7 +29,9 @@ def map_to_pred(batch):
         logits = model(input_values, attention_mask=attention_mask).logits
     pred_ids = torch.argmax(logits, dim=-1)
     batch["predicted"] = processor.batch_decode(pred_ids)
-    batch["target"] = [ batch["transcript"] ]
+    if batch["target"] is None:
+        batch["target"] = []
+    batch["target"].append(batch["transcript"])
     return batch
 
 
