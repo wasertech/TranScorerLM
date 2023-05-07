@@ -59,7 +59,7 @@ def main():
     print(f"Evalutating averages...")
     
 
-    ds = concatenate_datasets([d for _, d in datasets.items()])
+    ds = concatenate_datasets([d['test'] for _, d in datasets.items()])
 
     result = ds.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
