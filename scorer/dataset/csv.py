@@ -45,9 +45,7 @@ def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="tr
             test_data["train"] = test_data["train"].select(range(max_eval_samples))
 
         # Filter raw_datasets['eval'] to only include row with transcript not None
-        test_data["train"] = test_data["train"].filter(lambda row: row[text_column_name] not in [None, "", " ", "\n"])
-
-        test_data = test_data.rename_column("train", "test")
+        test_data["test"] = test_data["train"].filter(lambda row: row[text_column_name] not in [None, "", " ", "\n"])
 
         dataset_dict[f"{_dn.lower().replace(' ', '_')}"] = load_16khz_audio(test_data)
     
