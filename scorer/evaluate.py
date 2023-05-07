@@ -28,7 +28,7 @@ def map_to_pred(batch):
     with torch.no_grad():
         logits = model(input_values, attention_mask=attention_mask).logits
     pred_ids = torch.argmax(logits, dim=-1)
-    batch["predicted"] = [ processor.batch_decode(pred_ids) ]
+    batch["predicted"] = processor.batch_decode(pred_ids)
     batch["target"] = [ batch["transcript"] ]
     return batch
 
@@ -43,10 +43,10 @@ def main():
 
         result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
-        print(result.keys())
+        print(result['test'].keys())
 
-        _w = wer.compute(predictions=result["predicted"], references=result["target"])
-        _c = cer.compute(predictions=result["predicted"], references=result["target"])
+        _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
+        _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
         
         print("-"*13)
         print(f"|\t{split}\t|")
@@ -58,8 +58,8 @@ def main():
     
     result = datasets['test'].map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
-    _w = wer.compute(predictions=result["predicted"], references=result["target"])
-    _c = cer.compute(predictions=result["predicted"], references=result["target"])
+    _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
+    _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
     
     print("-"*13)
     print(f"|\tAverage Metrics\t|")
