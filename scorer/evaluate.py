@@ -48,8 +48,8 @@ def main():
         print(f"{result['test']['predicted']=}")
         print(f"{result['test']['target']=}")
 
-        _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"][0])
-        _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"][0])
+        _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
+        _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
         
         print("-"*13)
         print(f"|\t{split}\t|")
