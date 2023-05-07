@@ -25,7 +25,7 @@ def load_dev_dataset_csv(data_path):
 def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="transcript"):
     #test_files = glob(f"{str(data_path)}/**/*_dev.csv")
 
-    test_files = Path(data_path).rglob('*_dev.csv')
+    test_files = [ p.as_posix() for p in Path(data_path).rglob('*_dev.csv') ]
     if not test_files:
         raise ValueError(f"No test files found under {data_path}")
 
