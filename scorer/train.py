@@ -159,18 +159,18 @@ def train():
 
         train_data = concatenate_datasets([d['train'] for _, d in train_datasets.items()])
         
-        if data_args.audio_column_name not in train_data.column_names['train']:
+        if data_args.audio_column_name not in train_data.column_names:
             raise ValueError(
                 f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
                 " Make sure to set `--audio_column_name` to the correct audio column - one of"
-                f" {', '.join(train_data.column_names['train'])}."
+                f" {', '.join(train_data.column_names)}."
             )
 
-        if data_args.text_column_name not in train_data.column_names['train']:
+        if data_args.text_column_name not in train_data.column_names:
             raise ValueError(
                 f"--text_column_name {data_args.text_column_name} not found in dataset '{data_args.dataset_name}'. "
                 "Make sure to set `--text_column_name` to the correct text column - one of "
-                f"{', '.join(train_data.column_names['train'])}."
+                f"{', '.join(train_data.column_names)}."
             )
         
         raw_datasets["train"] = train_data['train']
@@ -187,18 +187,18 @@ def train():
 
         dev_data = concatenate_datasets([d['eval'] for _, d in dev_datasets.items()])
 
-        if data_args.audio_column_name not in dev_data.column_names['eval']:
+        if data_args.audio_column_name not in dev_data.column_names:
             raise ValueError(
                 f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
                 " Make sure to set `--audio_column_name` to the correct audio column - one of"
-                f" {', '.join(dev_data.column_names['eval'])}."
+                f" {', '.join(dev_data.column_names)}."
             )
 
-        if data_args.text_column_name not in dev_data.column_names['eval']:
+        if data_args.text_column_name not in dev_data.column_names:
             raise ValueError(
                 f"--text_column_name {data_args.text_column_name} not found in dataset '{data_args.dataset_name}'. "
                 "Make sure to set `--text_column_name` to the correct text column - one of "
-                f"{', '.join(dev_data.column_names['eval'])}."
+                f"{', '.join(dev_data.column_names)}."
             )
         
         raw_datasets["eval"] = dev_data['eval']
