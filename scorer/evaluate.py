@@ -22,7 +22,7 @@ processor = Wav2Vec2Processor.from_pretrained(model_name)
 datasets = load_test_dataset_csv("/mnt/extracted/data")
 
 def map_to_pred(batch):
-    features = processor(batch["audio"], sampling_rate=16000, padding=True, return_tensors="pt")
+    features = processor(batch["wav_filename"], sampling_rate=16000, padding=True, return_tensors="pt")
     input_values = features.input_values.to(device)
     attention_mask = features.attention_mask.to(device)
     with torch.no_grad():
@@ -52,6 +52,19 @@ def main():
         print("|\tWER\t|\tCER\t|")
         print(f"|\t{_w['wer']:.2%}\t|\t{_c['cer']:.2%}\t|")
         print("-"*13)
+
+    
+    result = datasets['test'].map(map_to_pred, batched=True, batch_size=16, remove_columns=list(datasets['test'].features.keys()))
+
+    _w = wer.compute(predictions=result["predicted"], references=result["target"])
+    _c = cer.compute(predictions=result["predicted"], references=result["target"])
+    
+    print("-"*13)
+    print(f"|\tAverage Metrics\t|")
+    print("-"*13)
+    print("|\tWER\t|\tCER\t|")
+    print(f"|\t{_w['wer']:.2%}\t|\t{_c['cer']:.2%}\t|")
+    print("-"*13)
 
 if __name__ == "__main__":
     main()
