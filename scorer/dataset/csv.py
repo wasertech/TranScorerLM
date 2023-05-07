@@ -3,7 +3,8 @@
 ## wav_filename, wav_filesize, transcript
 
 import os
-from glob import glob
+from pathlib import path
+#from glob import glob
 from datasets import concatenate_datasets, load_dataset, DatasetDict
 from datasets.features import Audio
 
@@ -22,7 +23,9 @@ def load_dev_dataset_csv(data_path):
     pass
 
 def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="transcript"):
-    test_files = glob(f"{str(data_path)}/**/*_dev.csv")
+    #test_files = glob(f"{str(data_path)}/**/*_dev.csv")
+
+    test_files = Path(data_path).rglob('*_dev.csv')
     if not test_files:
         raise ValueError(f"No test files found under {data_path}")
     
