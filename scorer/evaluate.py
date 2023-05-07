@@ -42,7 +42,7 @@ def main():
 
     for split, data in datasets.items():
 
-        print(f"Evalutating {split}...")
+        print(f"Evaluating {split}...")
 
         result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
