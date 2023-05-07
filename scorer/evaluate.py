@@ -30,7 +30,7 @@ def map_to_pred(batch):
     pred_ids = torch.argmax(logits, dim=-1)
     batch["predicted"] = processor.batch_decode(pred_ids)
     batch["target"] = batch["transcript"][0]
-    return batch[0]
+    return batch
 
 
 def main():
@@ -41,7 +41,7 @@ def main():
 
         print(f"Evalutating {split}...")
 
-        result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=list(data['test'].features.keys()))
+        result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
         _w = wer.compute(predictions=result["predicted"], references=result["target"])
         _c = cer.compute(predictions=result["predicted"], references=result["target"])
@@ -54,7 +54,7 @@ def main():
         print("-"*13)
 
     
-    result = datasets['test'].map(map_to_pred, batched=True, batch_size=16, remove_columns=list(datasets['test'].features.keys()))
+    result = datasets['test'].map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
     _w = wer.compute(predictions=result["predicted"], references=result["target"])
     _c = cer.compute(predictions=result["predicted"], references=result["target"])
