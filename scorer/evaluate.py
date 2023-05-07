@@ -43,6 +43,8 @@ def main():
 
         result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
+        print(result.keys())
+
         _w = wer.compute(predictions=result["predicted"], references=result["target"])
         _c = cer.compute(predictions=result["predicted"], references=result["target"])
         
