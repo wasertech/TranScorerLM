@@ -29,7 +29,7 @@ def map_to_pred(batch):
         logits = model(input_values, attention_mask=attention_mask).logits
     pred_ids = torch.argmax(logits, dim=-1)
     batch["predicted"] = processor.batch_decode(pred_ids)
-    batch["target"] = batch["transcript"].apply(lambda x: re.sub(chars_to_ignore_regex, "", x))
+    batch["target"] = batch["transcript"][0].apply(lambda x: re.sub(chars_to_ignore_regex, "", x))
     return batch
 
 
