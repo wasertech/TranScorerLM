@@ -29,9 +29,6 @@ def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="tr
     if not test_files:
         raise ValueError(f"No test files found under {data_path}")
 
-    print(test_files)
-    exit(4)
-
     dataset_dict = DatasetDict()
     for tf in test_files:
         test_data = load_dataset('csv', data_files=[tf])
