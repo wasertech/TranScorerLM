@@ -29,7 +29,7 @@ def map_to_pred(batch):
         logits = model(input_values, attention_mask=attention_mask).logits
     pred_ids = torch.argmax(logits, dim=-1)
     batch["predicted"] = processor.batch_decode(pred_ids)
-    batch["target"] = batch["transcript"]
+    batch["target"] = [ batch["transcript"] ]
     return batch
 
 
@@ -45,8 +45,8 @@ def main():
 
         print(result['test'])
 
-        _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
-        _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
+        _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"][0])
+        _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"][0])
         
         print("-"*13)
         print(f"|\t{split}\t|")
