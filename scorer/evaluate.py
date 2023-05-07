@@ -28,7 +28,7 @@ def map_to_pred(batch):
     with torch.no_grad():
         logits = model(input_values, attention_mask=attention_mask).logits
     pred_ids = torch.argmax(logits, dim=-1)
-    batch["predicted"] = processor.batch_decode(pred_ids)
+    batch["predicted"] = [ processor.batch_decode(pred_ids) ]
     batch["target"] = [ batch["transcript"] ]
     return batch
 
