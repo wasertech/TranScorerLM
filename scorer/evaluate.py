@@ -43,11 +43,11 @@ def main():
 
         result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
-        print(result['test']["predicted"])
-        print(result['test']["target"])
+        print(f"{result['test']['predicted']=}")
+        print(f"{result['test']['target']=}")
 
-        _w = wer.compute(predictions=result['test']["predicted"][0], references=result['test']["target"][0])
-        _c = cer.compute(predictions=result['test']["predicted"][0], references=result['test']["target"][0])
+        _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"][0])
+        _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"][0])
         
         print("-"*13)
         print(f"|\t{split}\t|")
