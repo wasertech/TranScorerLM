@@ -41,7 +41,7 @@ def main():
 
         print(f"Evalutating {split}...")
 
-        result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=list(data.features.keys()))
+        result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=list(data['test'].columns))
 
         _w = wer.compute(predictions=result["predicted"], references=result["target"])
         _c = cer.compute(predictions=result["predicted"], references=result["target"])
