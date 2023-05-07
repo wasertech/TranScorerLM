@@ -39,6 +39,7 @@ from transformers.utils.versions import require_version
 #from scorer import evaluate
 from scorer.transformer.dataset import TranScorerDataTrainingArguments, TrainingArguments, DataCollatorCTCWithPadding
 from scorer.transformer.transcorer import TranScorerModelArguments
+from scorer.dataset.csv import load_train_dataset_csv, load_dev_dataset_csv
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.26.1")
@@ -153,28 +154,10 @@ def train():
     raw_datasets = DatasetDict()
 
     if training_args.do_train:
-        train_files = glob(f"{str(data_args.data_path)}/**/*_train.csv")
-        if not train_files:
-            raise ValueError(f"No training files found under {data_args.data_path}")
-        
-        dataset_list = []
-        for tf in train_files:
-            train_data = load_dataset('csv', data_files=[tf])
-            base_abs_path = os.path.abspath(os.path.dirname(tf))
-            
-            def get_absolute_wavpath(wavpath):
-                wfn = wavpath['wav_filename']
-                wfp = os.path.join(base_abs_path, wfn)
-                wavpath['wav_filename'] = wfp
-                return wavpath
-            
-            train_data = train_data.map(get_absolute_wavpath, desc="Mapping relative wav files to absolute path")
+       
+        train_datasets = load_train_dataset_csv(data_args.data_path, max_eval_samples=data_args.max_train_samples)
 
-            #print(f"{train_data['train'][0]=}")
-
-            dataset_list.append(train_data['train'])
-
-        raw_datasets["train"] = concatenate_datasets(dataset_list)
+        train_data = concatenate_datasets([d['train'] for _, d in train_datasets.items()])
         
         if data_args.audio_column_name not in train_data.column_names['train']:
             raise ValueError(
@@ -189,10 +172,9 @@ def train():
                 "Make sure to set `--text_column_name` to the correct text column - one of "
                 f"{', '.join(train_data.column_names['train'])}."
             )
+        
+        raw_datasets["train"] = train_data['train']
 
-        if data_args.max_train_samples is not None:
-            raw_datasets["train"] = raw_datasets["train"].select(range(data_args.max_train_samples))
-    
         # Filter raw_datasets['train'] to only include row with transcript not None
         raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
 
@@ -200,32 +182,26 @@ def train():
         #print(f"{raw_datasets['train'][0]}")
 
     if training_args.do_eval:
-        dev_files = glob(f"{str(data_args.data_path)}/**/*_dev.csv")
-        if not dev_files:
-            raise ValueError(f"No dev files found under {data_args.data_path}")
-        dataset_list = []
-        for df in dev_files:
-            dev_data = load_dataset('csv', data_files=[df])
-            base_abs_path = os.path.abspath(os.path.dirname(df))
+        
+        dev_datasets = load_train_dataset_csv(data_args.data_path, max_eval_samples=data_args.max_train_samples)
 
-            def get_absolute_wavpath(wavpath):
-                wfn = wavpath['wav_filename']
-                wfp = os.path.join(base_abs_path, wfn)
-                wavpath['wav_filename'] = wfp
-                return wavpath
-            
-            dev_data = dev_data.map(
-                get_absolute_wavpath, desc="Mapping relative wav files to absolute path"
+        dev_data = concatenate_datasets([d['eval'] for _, d in dev_datasets.items()])
+
+        if data_args.audio_column_name not in dev_data.column_names['eval']:
+            raise ValueError(
+                f"--audio_column_name '{data_args.audio_column_name}' not found in dataset '{data_args.dataset_name}'."
+                " Make sure to set `--audio_column_name` to the correct audio column - one of"
+                f" {', '.join(dev_data.column_names['eval'])}."
             )
 
-            #print(f"{dev_data['train'][0]=}")
-
-            dataset_list.append(dev_data['train'])
-
-        raw_datasets["eval"] = concatenate_datasets(dataset_list)
-
-        if data_args.max_eval_samples is not None:
-            raw_datasets["eval"] = raw_datasets["eval"].select(range(data_args.max_eval_samples))
+        if data_args.text_column_name not in dev_data.column_names['eval']:
+            raise ValueError(
+                f"--text_column_name {data_args.text_column_name} not found in dataset '{data_args.dataset_name}'. "
+                "Make sure to set `--text_column_name` to the correct text column - one of "
+                f"{', '.join(dev_data.column_names['eval'])}."
+            )
+        
+        raw_datasets["eval"] = dev_data['eval']
         
         # Filter raw_datasets['eval'] to only include row with transcript not None
         raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
