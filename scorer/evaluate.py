@@ -22,7 +22,7 @@ processor = Wav2Vec2Processor.from_pretrained(model_name)
 datasets = load_test_dataset_csv("/mnt/extracted/data")
 
 def map_to_pred(batch):
-    features = processor(batch["wav_filename"], sampling_rate=16000, padding=True, return_tensors="pt")
+    features = processor(batch["wav_filename"]['array'], sampling_rate=16000, padding=True, return_tensors="pt")
     input_values = features.input_values.to(device)
     attention_mask = features.attention_mask.to(device)
     with torch.no_grad():
