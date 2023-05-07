@@ -29,7 +29,7 @@ def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="tr
     if not test_files:
         raise ValueError(f"No test files found under {data_path}")
     
-    print(test_files)
+    print(list(test_files))
 
     exit(4)
 
