@@ -63,8 +63,8 @@ def main():
 
     result = ds.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
-    _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
-    _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
+    _w = wer.compute(predictions=result["predicted"], references=result["target"])
+    _c = cer.compute(predictions=result["predicted"], references=result["target"])
     
     print("-"*(13+len("Average Metrics")+4))
     print(f"|\tAverage Metrics\t|")
