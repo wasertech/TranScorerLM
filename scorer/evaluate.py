@@ -46,9 +46,6 @@ def main():
 
         result = data.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
-        print(f"{result['test']['predicted']=}")
-        print(f"{result['test']['target']=}")
-
         _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
         _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
         
@@ -59,6 +56,7 @@ def main():
         print(f"|\t{_w:.2%}\t|\t{_c:.2%}\t|")
         print("-"*13)
 
+    print(f"Evalutating averages...")
     
     result = datasets['test'].map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
