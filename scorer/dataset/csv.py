@@ -28,10 +28,6 @@ def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="tr
     test_files = Path(data_path).rglob('*_dev.csv')
     if not test_files:
         raise ValueError(f"No test files found under {data_path}")
-    
-    print(list(test_files))
-
-    exit(4)
 
     dataset_dict = DatasetDict()
     for tf in test_files:
