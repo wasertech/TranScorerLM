@@ -56,7 +56,7 @@ def main():
         print(f"|\t{split}\t|")
         print("-"*13)
         print("|\tWER\t|\tCER\t|")
-        print(f"|\t{_w['wer']:.2%}\t|\t{_c['cer']:.2%}\t|")
+        print(f"|\t{_w:.2%}\t|\t{_c:.2%}\t|")
         print("-"*13)
 
     
@@ -69,7 +69,7 @@ def main():
     print(f"|\tAverage Metrics\t|")
     print("-"*13)
     print("|\tWER\t|\tCER\t|")
-    print(f"|\t{_w['wer']:.2%}\t|\t{_c['cer']:.2%}\t|")
+    print(f"|\t{_w:.2%}\t|\t{_c:.2%}\t|")
     print("-"*13)
 
 if __name__ == "__main__":
