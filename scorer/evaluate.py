@@ -1,5 +1,5 @@
 import torchaudio
-from datasets import load_dataset, load_metric
+from datasets import concatenate_datasets
 from transformers import (
     Wav2Vec2ForCTC,
     Wav2Vec2Processor,
@@ -49,21 +49,24 @@ def main():
         _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
         _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
         
-        print("-"*13)
+        print("-"*(13+len(split)+4))
         print(f"|\t{split}\t|")
-        print("-"*13)
+        print("-"*(13+len(split)+4))
         print("|\tWER\t|\tCER\t|")
         print(f"|\t{_w:.2%}\t|\t{_c:.2%}\t|")
-        print("-"*13)
+        print("-"*(13+len(split)+4))
 
     print(f"Evalutating averages...")
     
-    result = datasets['test'].map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
+
+    ds = concatenate_datasets([d for _, d in datasets.items()])
+
+    result = ds.map(map_to_pred, batched=True, batch_size=16, remove_columns=['wav_filename', 'wav_filesize', 'transcript'])
 
     _w = wer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
     _c = cer.compute(predictions=result['test']["predicted"], references=result['test']["target"])
     
-    print("-"*13)
+    print("-"*(13+len("Average Metrics")+4))
     print(f"|\tAverage Metrics\t|")
     print("-"*13)
     print("|\tWER\t|\tCER\t|")
