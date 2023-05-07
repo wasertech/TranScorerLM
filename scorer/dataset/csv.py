@@ -3,7 +3,7 @@
 ## wav_filename, wav_filesize, transcript
 
 import os
-from pathlib import path
+from pathlib import Path
 #from glob import glob
 from datasets import concatenate_datasets, load_dataset, DatasetDict
 from datasets.features import Audio
