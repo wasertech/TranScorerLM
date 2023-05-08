@@ -185,7 +185,7 @@ def train():
         
         dev_datasets = load_train_dataset_csv(data_args.data_path, max_eval_samples=data_args.max_train_samples)
 
-        dev_data = concatenate_datasets([d['eval'] for _, d in dev_datasets.items()])
+        dev_data = concatenate_datasets([d['train'] for _, d in dev_datasets.items()])
 
         if data_args.audio_column_name not in dev_data.column_names:
             raise ValueError(
