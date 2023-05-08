@@ -173,7 +173,7 @@ def train():
                 f"{', '.join(train_data.column_names)}."
             )
         
-        raw_datasets["train"] = train_data['train']
+        raw_datasets["train"] = train_data
 
         # Filter raw_datasets['train'] to only include row with transcript not None
         raw_datasets["train"] = raw_datasets["train"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
@@ -201,7 +201,7 @@ def train():
                 f"{', '.join(dev_data.column_names)}."
             )
         
-        raw_datasets["eval"] = dev_data['eval']
+        raw_datasets["eval"] = dev_data
         
         # Filter raw_datasets['eval'] to only include row with transcript not None
         raw_datasets["eval"] = raw_datasets["eval"].filter(lambda row: row[data_args.text_column_name] not in [None, "", " ", "\n"])
