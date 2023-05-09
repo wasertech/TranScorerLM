@@ -79,7 +79,7 @@ trainscorer \
     --seed 0
 ```
 
-You can also pass a `--push_to_hub` flag along with `--hub_token '${HUB_API_TOKEN}' --push_to_hub_model_id '${MODEL_ID}' --use_auth_token y` where `$HUB_API_TOKEN` is a valid HuggingFace API Token with write access, this will publish your models on the hub.
+You can also pass a `--push_to_hub` flag along with `--hub_token '${HUB_API_TOKEN}' --push_to_hub_model_id '${MODEL_ID}' --use_auth_token y`; where `$HUB_API_TOKEN` is a valid HuggingFace API Token (with write access) and `$MODEL_ID` is the name of the repo you want to create for your model, this will publish it on the hub under the above mentionned repository.
 
 You can also train directly from a `python` script.
 
