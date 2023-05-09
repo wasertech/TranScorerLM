@@ -44,7 +44,7 @@ python -m scorer.transformer.tokenizer \
     --test "This test sentence will be tokenized."
 ```
 
-## Training a new scorer from scratch
+## Training a new scorer from `facebook/wav2vec2-large-xlsr-53`
 
 Start training a scorer using  `trainscorer`.
 
