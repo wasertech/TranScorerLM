@@ -19,9 +19,7 @@ Decoding speech......Took 0.21528533000673633 second(s).
 CAN I TEST YOU
 ```
 
-When `--in_put` is a valid audio file, it is used to get the accoustic representation.
-
-Otherwise, accoustic representation is generated from text using TTS (VTCK/VITS). You can give a list of speakers to use (all by default).
+When `--file` is a valid audio file, it is used to get the accoustic representation.
 
 You can also use the *`scorer`* `python` module.
 
@@ -59,8 +57,8 @@ trainscorer \
     --output_dir wav2txt/models \
     --overwrite_output_dir \
     --remove_unused_columns False \
-    --do_train \
-    --do_eval \
+    --do_train y \
+    --do_eval y \
     --fp16 \
     --learning_rate 3e-5 \
     --max_length_seconds 1 \
@@ -78,9 +76,10 @@ trainscorer \
     --load_best_model_at_end True \
     --metric_for_best_model accuracy \
     --save_total_limit 3 \
-    --seed 0 \
-    --push_to_hub
+    --seed 0
 ```
+
+You can also pass a `--push_to_hub` flag along with `--hub_token '${HUB_API_TOKEN}' --push_to_hub_model_id '${MODEL_ID}' --use_auth_token y` where `$HUB_API_TOKEN` is a valid HuggingFace API Token with write access, this will publish your models on the hub.
 
 You can also train directly from a `python` script.
 
