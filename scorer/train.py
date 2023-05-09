@@ -501,9 +501,20 @@ def train():
             checkpoint = model_args.model_name_or_path
         else:
             checkpoint = None
+        print(f"{checkpoint=}")
 
+        print("Starting training now. This might take a while...")
+        if training_args.warmup_steps or training_args.warmup_ratio:
+            print("Statistics will be availiable after warmup session.")
+            if training_args.warmup_steps:
+                print(f"{training_args.warmup_steps=}")
+            if training_args.warmup_ratio:
+                print(f"{training_args.warmup_ratio=}")
+        print("Please wait...")
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         trainer.save_model()
+
+        print(f"{training_args.num_train_epochs} epochs trained.")
 
         metrics = train_result.metrics
         max_train_samples = (
