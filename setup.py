@@ -20,7 +20,7 @@ setup(
     packages=find_packages('.'),
     python_requires='>=3.8,<3.11',
     install_requires = [
-        'transformers~=4.26.1',
+        'transformers>=4.29.0',
         #'torch~=1.13.1',
         'datasets>=1.18.0',
     ],
