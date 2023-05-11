@@ -41,6 +41,8 @@ def load_train_dataset_csv(data_path, max_eval_samples=None, text_column_name="t
         # Filter raw_datasets['eval'] to only include row with transcript
         train_data["train"] = train_data["train"].filter(lambda row: row[text_column_name] not in [None, "", " ", "\n"])
 
+        train_data["train"] = train_data["train"].rename_column("wav_filesize", "input_length")
+
         dataset_dict[f"{_dn.lower().replace(' ', '_')}"] = load_16khz_audio(train_data)
     
     return dataset_dict
@@ -72,6 +74,8 @@ def load_dev_dataset_csv(data_path, max_eval_samples=None, text_column_name="tra
         # Filter raw_datasets['eval'] to only include row with transcript
         eval_data["eval"] = eval_data["train"].filter(lambda row: row[text_column_name] not in [None, "", " ", "\n"])
 
+        eval_data["eval"] = eval_data["eval"].rename_column("wav_filesize", "input_length")
+
         dataset_dict[f"{_dn.lower().replace(' ', '_')}"] = load_16khz_audio(eval_data)
     
     return dataset_dict
@@ -102,6 +106,8 @@ def load_test_dataset_csv(data_path, max_eval_samples=None, text_column_name="tr
 
         # Filter raw_datasets['eval'] to only include row with transcript
         test_data["test"] = test_data["train"].filter(lambda row: row[text_column_name] not in [None, "", " ", "\n"])
+
+        test_data["test"] = test_data["test"].rename_column("wav_filesize", "input_length")
 
         dataset_dict[f"{_dn.lower().replace(' ', '_')}"] = load_16khz_audio(test_data)
     
